@@ -99,7 +99,6 @@
 .stats b{line-height:1;font-variant-numeric:tabular-nums}
 .stats b:after,.stats article:last-child b:after{content:""}
 .stats b.has-plus:after{content:"+";display:inline-block;margin-left:3px;color:#9aab40;font-size:.44em;line-height:1;vertical-align:.14em}
-.motion-guide{display:none!important}
 @media(min-width:901px){
   .team-layout{grid-template-columns:minmax(0,1.2fr) minmax(580px,.95fr);gap:48px}
   .team-card{min-height:130px;padding:22px 28px}
