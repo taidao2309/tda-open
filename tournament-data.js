@@ -25,7 +25,7 @@ window.TDA_TOURNAMENT = {
     { id: 'P10', name: 'Lê Thiên Trang', rank: 'D' },
     { id: 'P11', name: 'Bùi Minh Sơn', rank: 'A' },
     { id: 'P12', name: 'An Thị Thanh Thảo', rank: 'D' },
-    { id: 'P13', name: 'Đào Văn Tài <3 Thúy Hường', rank: 'Yêu Hường' },
+    { id: 'P13', name: 'Đào Văn Tài', rank: 'B' },
     { id: 'P14', name: 'Nguyễn Thanh Phương', rank: 'C' },
     { id: 'P15', name: 'Đàm Sơn Đông', rank: 'B' },
     { id: 'P16', name: 'Trịnh Quốc Tuấn', rank: 'C' },
