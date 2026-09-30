@@ -91,14 +91,12 @@ const heroTitle=document.querySelector('.hero h1 span'), heroYear=document.query
 const motionGuide=document.querySelector('.motion-guide'), guideBall=document.querySelector('.guide-ball');
 let motionCurrent=window.scrollY,rafActive=false;
 function renderMotion(){
-  motionCurrent+=(motionTarget-motionCurrent)*.095;
+  motionCurrent=motionTarget;
   const vh=window.innerHeight,doc=Math.max(document.documentElement.scrollHeight-vh,1);
   const heroP=Math.min(Math.max(motionCurrent/(vh*.92),0),1);
   if(!reduceMotion&&window.innerWidth>900){
-    heroPhoto.style.transform=`translate3d(0,${heroP*34}px,0) scale(${1.0+heroP*.035})`;
-    heroContent.style.transform=`translate3d(0,${heroP*-18}px,0)`;
-    heroTitle.style.transform=`translate3d(${heroP*-28}px,0,0)`;
-    heroYear.style.transform=`translate3d(${heroP*42}px,0,0)`;
+    heroTitle.style.transform=`translate3d(${heroP*-18}px,0,0)`;
+    heroYear.style.transform=`translate3d(${heroP*24}px,0,0)`;
     orbitOne.style.transform=`translate3d(${heroP*22}px,${heroP*-15}px,0) rotate(${heroP*12}deg)`;
     orbitTwo.style.transform=`translate3d(${heroP*-16}px,${heroP*10}px,0) rotate(${heroP*-9}deg)`;
     shade.style.opacity=String(1-heroP*.2);
@@ -111,7 +109,7 @@ function renderMotion(){
       guideBall.style.transform=`translate3d(${x-21}px,${y-21}px,0) rotate(${progress*1260}deg)`;
     }
   }
-  if(Math.abs(motionTarget-motionCurrent)>.15){requestAnimationFrame(renderMotion)}else{rafActive=false}
+  rafActive=false;
 }
 function requestMotion(){if(!rafActive){rafActive=true;requestAnimationFrame(renderMotion)}}
 window.addEventListener('scroll',requestMotion,{passive:true});window.addEventListener('resize',requestMotion,{passive:true});requestMotion();
