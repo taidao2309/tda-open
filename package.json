@@ -1,0 +1,12 @@
+{
+  "name": "tda-open-2026",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "python3 -m http.server 4173 --bind 0.0.0.0",
+    "test:visual": "node tests/visual-check.js"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.55.0"
+  }
+}
