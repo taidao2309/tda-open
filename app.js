@@ -91,7 +91,7 @@ const heroTitle=document.querySelector('.hero h1 span'), heroYear=document.query
 const motionGuide=document.querySelector('.motion-guide'), guideBall=document.querySelector('.guide-ball');
 let motionCurrent=window.scrollY,rafActive=false;
 function renderMotion(){
-  motionCurrent=motionTarget;
+  motionCurrent+=(motionTarget-motionCurrent)*.13;
   const vh=window.innerHeight,doc=Math.max(document.documentElement.scrollHeight-vh,1);
   const heroP=Math.min(Math.max(motionCurrent/(vh*.92),0),1);
   if(!reduceMotion&&window.innerWidth>900){
@@ -110,6 +110,7 @@ function renderMotion(){
     }
   }
   rafActive=false;
+  if(Math.abs(motionTarget-motionCurrent)>.15)requestMotion();
 }
 function requestMotion(){if(!rafActive){rafActive=true;requestAnimationFrame(renderMotion)}}
 window.addEventListener('scroll',requestMotion,{passive:true});window.addEventListener('resize',requestMotion,{passive:true});requestMotion();

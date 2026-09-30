@@ -44,6 +44,42 @@
   .hero-bottom .scroll-cue{position:absolute;right:4vw;bottom:2vh;margin:0}
 }
 
+/* Final hero polish */
+.nav{background:linear-gradient(180deg,rgba(5,12,9,.46),rgba(5,12,9,.08));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.nav.scrolled{background:rgba(7,17,13,.88)}
+.nav-cta{transition:background .25s ease,color .25s ease,border-color .25s ease,transform .25s ease}
+.nav-cta:hover{background:var(--acid);border-color:var(--acid);color:var(--ink);transform:translateY(-2px)}
+.nav-cta:hover span{color:var(--ink)}
+.hero-bottom p{border-left:2px solid var(--acid);padding-left:14px;text-shadow:0 2px 14px rgba(0,0,0,.35)}
+.hero-meta{opacity:.82;text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.hero-shade{background:linear-gradient(90deg,rgba(7,17,13,.9) 0%,rgba(7,17,13,.56) 30%,rgba(7,17,13,.06) 72%),linear-gradient(0deg,rgba(7,17,13,.5),transparent 54%),radial-gradient(ellipse at 62% 38%,transparent 0%,rgba(7,17,13,.12) 70%)}
+.hero-billiard{position:absolute;right:4vw;bottom:7vh;width:470px;height:250px;z-index:4;pointer-events:none;opacity:0;transform:translateY(18px);transition:opacity .45s ease,transform .45s ease}
+.hero.cue-shot .hero-billiard{opacity:.9;transform:translateY(0)}
+.hero-billiard-trail{position:absolute;left:55px;right:18px;bottom:84px;border-top:1px dashed rgba(200,245,54,.45);transform:rotate(-7deg);opacity:.8}
+.cue-stick{position:absolute;left:-100px;bottom:78px;width:270px;height:7px;border-radius:99px;background:linear-gradient(90deg,#ad7d3c,#eee1bf 72%,#fff);box-shadow:0 4px 12px rgba(0,0,0,.5);transform:rotate(-7deg);opacity:0}
+.cue-ball,.target-ball{position:absolute;bottom:72px;width:42px;height:42px;border-radius:50%;display:grid;place-items:center}
+.cue-ball{left:65px;background:radial-gradient(circle at 34% 27%,#fff 0 12%,#e9ece2 40%,#9ea99d 100%);box-shadow:0 6px 15px rgba(0,0,0,.5);opacity:0}
+.target-ball{right:30px;background:radial-gradient(circle at 34% 27%,#fff57c 0,#f5d729 27%,#c69e0b 75%,#7c6500 100%);color:#1a2419;font:800 15px Georgia;box-shadow:0 6px 15px rgba(0,0,0,.5)}
+.cue-impact{position:absolute;right:13px;bottom:55px;width:76px;height:76px;border:2px solid var(--acid);border-radius:50%;opacity:0;transform:scale(.35)}
+.hero.cue-shot .cue-stick{animation:cueStrike 1.15s cubic-bezier(.2,.75,.25,1) .15s both}
+.hero.cue-shot .cue-ball{animation:cueTravel 1.15s cubic-bezier(.2,.75,.25,1) .38s both}
+.hero.cue-shot .cue-impact{animation:cueImpact .6s ease-out 1.35s both}
+@keyframes cueStrike{0%{left:-100px;opacity:0}20%{opacity:1}100%{left:43px;opacity:0}}
+@keyframes cueTravel{0%{left:65px;opacity:1}82%{left:345px;opacity:1}100%{left:378px;opacity:0}}
+@keyframes cueImpact{0%{opacity:.9;transform:scale(.35)}100%{opacity:0;transform:scale(1.35)}}
+@media(max-width:900px){.hero-billiard{right:-30px;bottom:10vh;transform:scale(.62);transform-origin:right bottom}.hero.cue-shot .hero-billiard{transform:scale(.62)}}
+@media(prefers-reduced-motion:reduce){.hero-billiard{opacity:.45;transform:none}.hero-billiard .cue-stick,.hero-billiard .cue-ball,.hero-billiard .cue-impact{animation:none}.hero-billiard .cue-stick{left:43px;opacity:0}.hero-billiard .cue-ball{left:378px;opacity:0}.hero-billiard-trail{opacity:.25}}
+
+/* The shot is scrubbed by scroll in app.js, so it reverses naturally when scrolling upward. */
+@media(min-width:901px){
+  .hero-billiard .cue-stick,.hero-billiard .cue-ball,.hero-billiard .cue-impact{animation:none!important}
+}
+
+/* Clean photographic finish for the hero. */
+.hero .grain{display:none!important}
+.hero-photo{filter:saturate(1.03) contrast(1.06) brightness(1.1)}
+.hero-shade{background:linear-gradient(90deg,rgba(7,17,13,.8) 0%,rgba(7,17,13,.42) 32%,rgba(7,17,13,.03) 74%),linear-gradient(0deg,rgba(7,17,13,.38),transparent 58%),radial-gradient(ellipse at 64% 38%,transparent 0%,rgba(7,17,13,.08) 72%)}
+
 /* Enhanced hero source: 2x high-quality upscale with controlled sharpening. */
 .hero-photo{background-image:url("assets/tda-team-enhanced.jpg");}
 .hero .grain{animation:none;transform:none;opacity:.075}.hero-photo{transform:none!important;animation:none!important;will-change:auto}.hero-content{will-change:auto}.hero h1 span,.hero h1 strong{backface-visibility:hidden}.hero{contain:paint}
@@ -63,6 +99,8 @@
 .stats b{line-height:1;font-variant-numeric:tabular-nums}
 .stats b:after,.stats article:last-child b:after{content:""}
 .stats b.has-plus:after{content:"+";display:inline-block;margin-left:3px;color:#9aab40;font-size:.44em;line-height:1;vertical-align:.14em}
+.ticker-track{animation:ticker 30s linear infinite}
+@keyframes ticker{to{transform:translateX(-33.333333%)}}
 .player-card .rank-badge{position:absolute;right:22px;top:22px;min-width:54px;height:28px;padding:0 10px;border:0;border-radius:20px;display:grid;place-items:center;font:800 9px var(--sans);letter-spacing:1px;color:var(--ink);transition:transform .3s,box-shadow .3s}
 .player-card:hover .rank-badge{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.2)}
 .player-card[data-rank="S"] .rank-badge{background:#c8f536}
