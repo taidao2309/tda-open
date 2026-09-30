@@ -30,7 +30,7 @@ function renderGroup(group){
   const groupTeams=teams.filter(team=>team.group===group);
   teamList.innerHTML=groupTeams.map(team=>{
     const members=team.playerIds.map(playerById).filter(Boolean);
-    return `<article class="team-card"><div class="team-id"><span>${team.id}</span><b>${team.name}</b></div><div class="team-members">${members.length?members.map(player=>`<p><span>${player.name}</span><i>Rank ${player.rank}</i></p>`).join(''):'<p class="waiting">Chưa chia cơ thủ</p>'}</div></article>`;
+     return `<article class="team-card"><div class="team-id"><span>${team.id}</span><b>${team.name}</b></div><div class="team-members">${members.length?members.map(player=>`<p><span>${player.name}</span><i class="rank-${player.rank}">Rank ${player.rank}</i></p>`).join(''):'<p class="waiting">Chưa chia cơ thủ</p>'}</div></article>`;
   }).join('');
   const stats=groupTeams.map(team=>({team,played:0,won:0,lost:0,points:0}));
   matches.group.filter(match=>match.group===group && Number.isFinite(match.scoreHome) && Number.isFinite(match.scoreAway)).forEach(match=>{
@@ -89,11 +89,23 @@ const heroPhoto=document.querySelector('.hero-photo'), heroContent=document.quer
 const orbitOne=document.querySelector('.orbit-one'), orbitTwo=document.querySelector('.orbit-two');
 const heroTitle=document.querySelector('.hero h1 span'), heroYear=document.querySelector('.hero h1 strong');
 const motionGuide=document.querySelector('.motion-guide'), guideBall=document.querySelector('.guide-ball');
+const formatTitle=document.querySelector('.format-title');
+const formatSection=document.querySelector('.format');
+const formatSteps=document.querySelectorAll('.format-steps article');
 let motionCurrent=window.scrollY,rafActive=false;
 function renderMotion(){
   motionCurrent+=(motionTarget-motionCurrent)*.13;
   const vh=window.innerHeight,doc=Math.max(document.documentElement.scrollHeight-vh,1);
   const heroP=Math.min(Math.max(motionCurrent/(vh*.92),0),1);
+  if(formatTitle&&formatSection){
+    const formatTop=formatSection.getBoundingClientRect().top;
+    const formatProgress=Math.min(Math.max((vh*.86-formatTop)/(vh*.72),0),1);
+    formatTitle.style.setProperty('--format-progress',formatProgress.toFixed(3));
+    formatSteps.forEach((step,index)=>{
+      const stepProgress=Math.min(Math.max((formatProgress-(index*.22+.16))/.28,0),1);
+      step.style.setProperty('--step-progress',stepProgress.toFixed(3));
+    });
+  }
   if(!reduceMotion&&window.innerWidth>900){
     heroTitle.style.transform=`translate3d(${heroP*-72}px,${heroP*10}px,0) rotate(${heroP*-1.2}deg)`;
     heroYear.style.transform=`translate3d(${heroP*92}px,${heroP*14}px,0) rotate(${heroP*1.5}deg)`;
@@ -116,4 +128,4 @@ function requestMotion(){if(!rafActive){rafActive=true;requestAnimationFrame(ren
 window.addEventListener('scroll',requestMotion,{passive:true});window.addEventListener('resize',requestMotion,{passive:true});requestMotion();
 
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.animate([{opacity:0,transform:'translate3d(0,26px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],{duration:720,delay:Math.min(+(entry.target.dataset.motionIndex||0)*45,270),easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});entry.target.classList.add('motion-in');observer.unobserve(entry.target)}}),{threshold:.08,rootMargin:'0px 0px -5%'});
-document.querySelectorAll('section:not(.hero):not(.ticker) h2,.format-steps article,.player-card,.team-card,.match,.duel,.bracket-board').forEach((el,index)=>{el.dataset.motionIndex=index%6;observer.observe(el)});
+document.querySelectorAll('section:not(.hero):not(.ticker):not(.format) h2,.player-card,.team-card,.match,.duel,.bracket-board').forEach((el,index)=>{el.dataset.motionIndex=index%6;observer.observe(el)});
