@@ -114,8 +114,5 @@ function renderMotion(){
 function requestMotion(){if(!rafActive){rafActive=true;requestAnimationFrame(renderMotion)}}
 window.addEventListener('scroll',requestMotion,{passive:true});window.addEventListener('resize',requestMotion,{passive:true});requestMotion();
 
-const glow=document.querySelector('.cursor-glow');
-window.addEventListener('pointermove',e=>{glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px'},{passive:true});
-
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.animate([{opacity:0,transform:'translate3d(0,26px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],{duration:720,delay:Math.min(+(entry.target.dataset.motionIndex||0)*45,270),easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});entry.target.classList.add('motion-in');observer.unobserve(entry.target)}}),{threshold:.08,rootMargin:'0px 0px -5%'});
 document.querySelectorAll('section:not(.hero):not(.ticker) h2,.format-steps article,.player-card,.team-card,.match,.duel,.bracket-board').forEach((el,index)=>{el.dataset.motionIndex=index%6;observer.observe(el)});

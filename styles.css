@@ -39,6 +39,13 @@
 .primary-btn{min-width:220px;padding:7px 7px 7px 23px;align-items:center;justify-content:space-between;gap:35px;overflow:hidden;isolation:isolate;transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s}.primary-btn:before{content:"";position:absolute;z-index:-1;inset:0;background:#edfcb6;transform:translateX(-102%);transition:transform .45s cubic-bezier(.2,.8,.2,1)}.primary-btn:hover:before{transform:translateX(0)}.primary-btn:hover{transform:translateY(-3px);box-shadow:0 13px 28px rgba(0,0,0,.2)}.primary-btn:active{transform:translateY(-1px) scale(.985)}.btn-label{white-space:nowrap}.cta-arrow{width:42px;height:42px;border-radius:50%;background:var(--ink);color:var(--acid);display:grid;place-items:center;overflow:hidden}.cta-arrow svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .4s cubic-bezier(.2,.8,.2,1)}.primary-btn:hover .cta-arrow svg{animation:ctaFlight .55s cubic-bezier(.2,.8,.2,1)}@keyframes ctaFlight{0%{transform:translate(0,0)}45%{transform:translate(15px,-15px);opacity:0}46%{transform:translate(-15px,15px);opacity:0}100%{transform:translate(0,0);opacity:1}}
 @media(max-width:560px){.scroll-cue i{width:48px;height:48px}.primary-btn{min-width:210px}.cta-arrow{width:40px;height:40px}}
 @media(prefers-reduced-motion:reduce){.scroll-cue i:after,.scroll-cue svg{animation:none!important}.primary-btn:hover .cta-arrow svg{animation:none!important}.primary-btn,.primary-btn:before,.mini-arrow{transition:none!important}}
+
+@media(min-width:901px){
+  .hero-bottom .scroll-cue{position:absolute;right:4vw;bottom:2vh;margin:0}
+}
+
+/* Enhanced hero source: 2x high-quality upscale with controlled sharpening. */
+.hero-photo{background-image:url("assets/tda-team-enhanced.jpg");}
 .hero .grain{animation:none;transform:none;opacity:.075}.hero-photo{transform:none!important;animation:none!important;will-change:auto}.hero-content{will-change:auto}.hero h1 span,.hero h1 strong{backface-visibility:hidden}.hero{contain:paint}
 .brand-icon{filter:none}
 
