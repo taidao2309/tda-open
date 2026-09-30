@@ -95,8 +95,8 @@ function renderMotion(){
   const vh=window.innerHeight,doc=Math.max(document.documentElement.scrollHeight-vh,1);
   const heroP=Math.min(Math.max(motionCurrent/(vh*.92),0),1);
   if(!reduceMotion&&window.innerWidth>900){
-    heroTitle.style.transform=`translate3d(${heroP*-18}px,0,0)`;
-    heroYear.style.transform=`translate3d(${heroP*24}px,0,0)`;
+    heroTitle.style.transform=`translate3d(${heroP*-72}px,${heroP*10}px,0) rotate(${heroP*-1.2}deg)`;
+    heroYear.style.transform=`translate3d(${heroP*92}px,${heroP*14}px,0) rotate(${heroP*1.5}deg)`;
     orbitOne.style.transform=`translate3d(${heroP*22}px,${heroP*-15}px,0) rotate(${heroP*12}deg)`;
     orbitTwo.style.transform=`translate3d(${heroP*-16}px,${heroP*10}px,0) rotate(${heroP*-9}deg)`;
     shade.style.opacity=String(1-heroP*.2);

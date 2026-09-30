@@ -99,6 +99,7 @@
 .stats b{line-height:1;font-variant-numeric:tabular-nums}
 .stats b:after,.stats article:last-child b:after{content:""}
 .stats b.has-plus:after{content:"+";display:inline-block;margin-left:3px;color:#9aab40;font-size:.44em;line-height:1;vertical-align:.14em}
+.hero h1 span,.hero h1 strong{transition:none!important}
 .ticker-track{animation:ticker 30s linear infinite}
 @keyframes ticker{to{transform:translateX(-33.333333%)}}
 .player-card .rank-badge{position:absolute;right:22px;top:22px;min-width:54px;height:28px;padding:0 10px;border:0;border-radius:20px;display:grid;place-items:center;font:800 9px var(--sans);letter-spacing:1px;color:var(--ink);transition:transform .3s,box-shadow .3s}
