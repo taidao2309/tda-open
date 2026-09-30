@@ -14,7 +14,7 @@ const viewports = [
   const browser = await chromium.launch({ executablePath: '/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
   let failed = false;
   for (const viewport of viewports) {
-    const page = await browser.newPage({ viewportSize: viewport, reducedMotion: 'reduce' });
+    const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height }, reducedMotion: 'reduce' });
     await page.goto('http://127.0.0.1:4173', { waitUntil: 'networkidle' });
     await page.screenshot({ path: `test-results/${viewport.name}.png`, fullPage: true });
     const issues = await page.evaluate(() => {

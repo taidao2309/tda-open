@@ -13,32 +13,40 @@ window.TDA_TOURNAMENT = {
 
   // rank hợp lệ: S, A, B, C, D, F
   players: [
-    { id: 'P01', name: 'Nguyễn Hoàng Anh', rank: 'S' },
-    { id: 'P02', name: 'Trần Minh Đức', rank: 'A' },
-    { id: 'P03', name: 'Lê Quốc Bảo', rank: 'A' },
-    { id: 'P04', name: 'Phạm Tuấn Kiệt', rank: 'B' },
-    { id: 'P05', name: 'Vũ Thành Long', rank: 'B' },
-    { id: 'P06', name: 'Đỗ Anh Quân', rank: 'C' },
-    { id: 'P07', name: 'Bùi Gia Huy', rank: 'C' },
-    { id: 'P08', name: 'Nguyễn Trung Hiếu', rank: 'D' },
-    { id: 'P09', name: 'Hoàng Nam Khánh', rank: 'D' },
-    { id: 'P10', name: 'Trịnh Công Minh', rank: 'F' },
-    { id: 'P11', name: 'Đặng Duy Khang', rank: 'F' },
-    { id: 'P12', name: 'Mai Đức Thịnh', rank: 'F' }
+    { id: 'P01', name: 'Nguyễn Phương Thái', rank: 'S' },
+    { id: 'P02', name: 'Đào Phương Nguyên', rank: 'F' },
+    { id: 'P03', name: 'Đặng Văn Long', rank: 'S' },
+    { id: 'P04', name: 'Nguyễn Nguyên Huy Tuấn', rank: 'F' },
+    { id: 'P05', name: 'Đinh Tuấn Anh', rank: 'A' },
+    { id: 'P06', name: 'Lê Huy Hải Anh', rank: 'D' },
+    { id: 'P07', name: 'Bùi Ngọc Thế', rank: 'A' },
+    { id: 'P08', name: 'Khúc Chí Phát', rank: 'D' },
+    { id: 'P09', name: 'Nguyễn Đình Hải', rank: 'A' },
+    { id: 'P10', name: 'Lê Thiên Trang', rank: 'D' },
+    { id: 'P11', name: 'Bùi Minh Sơn', rank: 'A' },
+    { id: 'P12', name: 'An Thị Thanh Thảo', rank: 'D' },
+    { id: 'P13', name: 'Đào Văn Tài', rank: 'B' },
+    { id: 'P14', name: 'Nguyễn Thanh Phương', rank: 'C' },
+    { id: 'P15', name: 'Đàm Sơn Đông', rank: 'B' },
+    { id: 'P16', name: 'Trịnh Quốc Tuấn', rank: 'C' },
+    { id: 'P17', name: 'Đỗ Đức Huy', rank: 'B' },
+    { id: 'P18', name: 'Nguyễn Duy Đại', rank: 'C' },
+    { id: 'P19', name: 'Lăng Đại Dương', rank: 'B' },
+    { id: 'P20', name: 'Nguyễn Duy Hải', rank: 'C' }
   ],
 
   // Sau khi bắt cặp, điền playerId tương ứng vào từng đội.
   teams: [
-    { id: 'T01', name: 'Đội 1', group: 'A', playerIds: ['P01', 'P10'], substituteId: '' },
-    { id: 'T02', name: 'Đội 2', group: 'A', playerIds: ['P02', 'P09'], substituteId: '' },
-    { id: 'T03', name: 'Đội 3', group: 'A', playerIds: ['P03', 'P08'], substituteId: '' },
-    { id: 'T04', name: 'Đội 4', group: 'A', playerIds: ['P04', 'P07'], substituteId: '' },
-    { id: 'T05', name: 'Đội 5', group: 'A', playerIds: ['P05', 'P06'], substituteId: '' },
-    { id: 'T06', name: 'Đội 6', group: 'B', playerIds: [], substituteId: '' },
-    { id: 'T07', name: 'Đội 7', group: 'B', playerIds: [], substituteId: '' },
-    { id: 'T08', name: 'Đội 8', group: 'B', playerIds: [], substituteId: '' },
-    { id: 'T09', name: 'Đội 9', group: 'B', playerIds: [], substituteId: '' },
-    { id: 'T10', name: 'Đội 10', group: 'B', playerIds: [], substituteId: '' }
+    { id: 'T01', name: 'Đội 1', group: 'B', playerIds: ['P01', 'P02'] },
+    { id: 'T02', name: 'Đội 2', group: 'B', playerIds: ['P03', 'P04'] },
+    { id: 'T03', name: 'Đội 3', group: 'A', playerIds: ['P05', 'P06'] },
+    { id: 'T04', name: 'Đội 4', group: 'A', playerIds: ['P07', 'P08'] },
+    { id: 'T05', name: 'Đội 5', group: 'A', playerIds: ['P09', 'P10'] },
+    { id: 'T06', name: 'Đội 6', group: 'B', playerIds: ['P11', 'P12'] },
+    { id: 'T07', name: 'Đội 7', group: 'B', playerIds: ['P13', 'P14'] },
+    { id: 'T08', name: 'Đội 8', group: 'A', playerIds: ['P15', 'P16'] },
+    { id: 'T09', name: 'Đội 9', group: 'A', playerIds: ['P17', 'P18'] },
+    { id: 'T10', name: 'Đội 10', group: 'B', playerIds: ['P19', 'P20'] }
   ],
 
   // scoreHome/scoreAway: để null nếu trận chưa đấu. Đội thắng được +1 điểm.

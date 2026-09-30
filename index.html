@@ -16,14 +16,18 @@
 </head>
 <body>
   <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="motion-guide" aria-hidden="true">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M88,5 C72,18 82,31 52,39 S13,57 32,72 S79,83 91,96"/></svg>
+    <div class="guide-ball"><span>9</span></div>
+  </div>
   <header class="nav" id="nav">
     <a class="brand" href="#top" aria-label="TDA Open 2026">
-      <span class="brand-mark">T</span><span>TDA <b>OPEN</b></span>
+      <img class="brand-icon" src="assets/billiards-mark.svg" alt=""><span>TDA <b>OPEN</b></span>
     </a>
     <nav aria-label="Điều hướng chính">
       <a href="#about">Giải đấu</a><a href="#players">Cơ thủ</a><a href="#teams">Chia đội</a><a href="#schedule">Lịch đấu</a><a href="#bracket">Bảng đấu</a>
     </nav>
-    <a class="nav-cta" href="#register">Đăng ký <span>↗</span></a>
+    <a class="nav-cta" href="#register">Đăng ký <span class="mini-arrow" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 12 12 4M6 4h6v6"/></svg></span></a>
     <button class="menu-btn" aria-label="Mở menu" aria-expanded="false"><span></span><span></span></button>
   </header>
 
@@ -38,7 +42,7 @@
         <h1 class="reveal"><span>TDA OPEN</span><strong>2026</strong></h1>
         <div class="hero-bottom reveal">
           <p>Một cơ. Một cơ hội.<br><b>Bản lĩnh lên tiếng.</b></p>
-          <a href="#about" class="scroll-cue"><span>Khám phá giải đấu</span><i>↓</i></a>
+          <a href="#about" class="scroll-cue"><span>Khám phá giải đấu</span><i aria-hidden="true"><svg viewBox="0 0 20 28"><path d="M10 2v19"/><path d="m4 16 6 6 6-6"/></svg></i></a>
         </div>
       </div>
       <div class="hero-meta"><span>HANOI · VIETNAM</span><span>POOL 9-BALL</span><span>2026</span></div>
@@ -71,9 +75,9 @@
       <div class="format-grid">
         <div class="format-title"><p class="kicker">Luật chơi</p><h2>ĐƯỜNG ĐẾN<br><em>NGÔI VƯƠNG</em></h2></div>
         <div class="format-steps">
-          <article><span>01</span><div><h3>Vòng bảng</h3><p>Các cơ thủ được chia bảng dựa trên rank, thi đấu vòng tròn tính điểm. Những cá nhân dẫn đầu mỗi bảng bước tiếp.</p></div><b>32 → 8</b></article>
-          <article><span>02</span><div><h3>Loại trực tiếp</h3><p>Tám cơ thủ xuất sắc bước vào nhánh đấu loại trực tiếp. Từ vòng này, không còn chỗ cho sai lầm.</p></div><b>8 → 2</b></article>
-          <article><span>03</span><div><h3>Chung kết</h3><p>Hai đại diện xuất sắc nhất tranh chiếc cúp TDA Open và ngôi vị nhà vô địch mùa giải 2026.</p></div><b>2 → 1</b></article>
+          <article><span>01</span><div><h3>Chia đội & vòng bảng</h3><p>20 cơ thủ được bắt cặp thành 10 đội, chia đều vào bảng A và B. Mỗi bảng thi đấu vòng tròn, hai đội dẫn đầu bước tiếp.</p></div><b>10 → 4</b></article>
+          <article><span>02</span><div><h3>Bán kết</h3><p>Bốn đội vượt qua vòng bảng thi đấu chéo: nhất bảng A gặp nhì bảng B, nhất bảng B gặp nhì bảng A.</p></div><b>4 → 2</b></article>
+          <article><span>03</span><div><h3>Chung kết</h3><p>Hai đội thắng bán kết tranh chiếc cúp TDA Open và ngôi vị nhà vô địch mùa giải 2026.</p></div><b>2 → 1</b></article>
         </div>
       </div>
     </section>
@@ -102,22 +106,18 @@
 
     <section class="bracket section" id="bracket">
       <div class="section-head"><div><div class="section-no">06 / BẢNG ĐẤU</div><h2>HÀNH TRÌNH TỚI<br><em>CHỨC VÔ ĐỊCH</em></h2></div><p class="muted">Kết quả được cập nhật từ file dữ liệu giải đấu.</p></div>
-      <div class="bracket-board">
-        <div class="round"><h3>BÁN KẾT <span>01</span></h3><div class="duel"><p><b>NGUYỄN HOÀNG ANH · S</b><span>7</span></p><p><b>LÊ QUỐC BẢO · A</b><span>4</span></p></div><div class="duel"><p><b>VŨ THÀNH LONG · A</b><span>7</span></p><p><b>BÙI GIA HUY · B</b><span>6</span></p></div></div>
-        <div class="round final-round"><h3>CHUNG KẾT <span>02</span></h3><div class="duel featured"><p><b>NGUYỄN HOÀNG ANH · S</b><span>—</span></p><p><b>VŨ THÀNH LONG · A</b><span>—</span></p><small>20:00 · 18.10.2026</small></div></div>
-        <div class="champion"><span>NHÀ VÔ ĐỊCH</span><div class="trophy">♛</div><h3>WHO<br>WILL<br>RISE?</h3></div>
-      </div>
+      <div class="bracket-board" id="bracketBoard"></div>
     </section>
 
     <section class="register section" id="register">
       <div class="register-ball"><span>9</span></div>
       <p class="kicker">Bạn đã sẵn sàng?</p><h2>GHI DANH.<br><em>GHI DẤU.</em></h2>
       <p>Đăng ký tham dự TDA Open 2026 và trở thành một phần của mùa giải đáng nhớ nhất.</p>
-      <a class="primary-btn" href="https://docs.google.com/spreadsheets/d/1xyZ-fIjWkKUZij2PaqU4v8XMMtxrxcBBSRNH40vzYf0/edit?usp=sharing" target="_blank" rel="noopener">Đăng ký ngay <span>↗</span></a>
+      <a class="primary-btn" href="https://docs.google.com/spreadsheets/d/1xyZ-fIjWkKUZij2PaqU4v8XMMtxrxcBBSRNH40vzYf0/edit?usp=sharing" target="_blank" rel="noopener"><span class="btn-label">Đăng ký ngay</span><span class="cta-arrow" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5 15 15 5M7 5h8v8"/></svg></span></a>
     </section>
   </main>
 
-  <footer><a class="brand" href="#top"><span class="brand-mark">T</span><span>TDA <b>OPEN</b></span></a><p>© 2026 TDA Open. All rights reserved.</p><div><a href="#players">Danh sách</a><a href="#schedule">Lịch đấu</a><a href="#bracket">Bảng đấu</a></div></footer>
+  <footer><a class="brand" href="#top"><img class="brand-icon" src="assets/billiards-mark.svg" alt=""><span>TDA <b>OPEN</b></span></a><p>© 2026 TDA Open. All rights reserved.</p><div><a href="#players">Danh sách</a><a href="#schedule">Lịch đấu</a><a href="#bracket">Bảng đấu</a></div></footer>
   <script src="tournament-data.js"></script>
   <script src="app.js"></script>
 </body>
