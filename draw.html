@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Bốc thăm chia đội TDA Open 2026">
+  <meta name="theme-color" content="#020c06">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="alternate icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/favicon.png">
+  <title>Bốc Thăm — TDA Open 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;0,900;1,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=18">
+  <style>
+    html,body{background:#020c06;min-height:100vh;overflow-x:clip;scroll-behavior:auto}
+    .draw-screen{padding-top:70px}
+    .draw-group-list{contain:layout style}
+    @media(max-width:560px){.draw-screen{padding-top:58px}}
+  </style>
+</head>
+<body>
+
+  <header class="draw-topbar">
+    <a class="brand" href="index.html" aria-label="TDA Billiards">
+      <img class="brand-logo" src="assets/tda-logo.png" width="1147" height="848" alt="TDA Billiards">
+    </a>
+    <a href="index.html" class="draw-back-btn">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Trang chủ
+    </a>
+  </header>
+
+  <main class="draw-screen" id="draw">
+    <div class="draw-bg-orb orb-tl" aria-hidden="true"></div>
+    <div class="draw-bg-orb orb-br" aria-hidden="true"></div>
+
+    <!-- ── STEP 1: INTRO ── -->
+    <div class="draw-intro" id="drawIntro">
+      <div class="draw-intro-inner">
+
+        <div class="draw-step-pill">
+          <span class="draw-step-dot"></span>
+          BƯỚC 1 / 2 &nbsp;·&nbsp; CHIA ĐỘI
+        </div>
+
+        <h1 class="draw-main-title">BỐC THĂM<br><em>CHIA ĐỘI</em></h1>
+
+        <p class="draw-desc">
+          Ghép cặp tự động theo công thức cân bằng trình độ.<br>
+          Khi hết cặp tự nhiên, hệ thống ghép lệch tối thiểu 1 rank.
+        </p>
+
+        <!-- Pairing formula visual -->
+        <div class="draw-formula">
+          <div class="draw-formula-pair">
+            <span class="dr-s">S</span>
+            <span class="draw-formula-dash">—</span>
+            <span class="dr-f">F</span>
+          </div>
+          <span class="draw-formula-sep">·</span>
+          <div class="draw-formula-pair">
+            <span class="dr-a">A</span>
+            <span class="draw-formula-dash">—</span>
+            <span class="dr-d">D</span>
+          </div>
+          <span class="draw-formula-sep">·</span>
+          <div class="draw-formula-pair">
+            <span class="dr-b">B</span>
+            <span class="draw-formula-dash">—</span>
+            <span class="dr-c">C</span>
+          </div>
+        </div>
+
+        <!-- Player chips -->
+        <div class="draw-chips" id="drawChips"></div>
+
+        <button class="draw-cta" id="drawStartBtn">
+          <span class="draw-cta-label">Bắt đầu bốc thăm</span>
+          <span class="draw-cta-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.6v14.8a1 1 0 0 0 1.52.85l12-7.4a1 1 0 0 0 0-1.7l-12-7.4A1 1 0 0 0 7 4.6z"/></svg>
+          </span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ── STEP 1: DRAWING ARENA ── -->
+    <div class="draw-arena" id="drawArena" hidden>
+
+      <div class="draw-phase-header">
+        <span class="draw-phase-label">BƯỚC 1 / 2</span>
+        <span class="draw-phase-title">CHIA ĐỘI · BỐC THĂM</span>
+      </div>
+
+      <div class="draw-arena-top">
+        <span class="draw-live-badge" id="drawLiveBadge">🎲 ĐANG BỐC THĂM</span>
+        <div class="draw-progress-dots" id="drawDots"></div>
+      </div>
+
+      <!-- Team cards revealed one by one -->
+      <div class="draw-grid" id="drawGrid"></div>
+
+      <!-- Step 2 trigger — appears after all teams drawn -->
+      <div class="draw-step2-zone" id="drawStep2Zone" hidden>
+        <span class="draw-step2-count" id="drawStep2Count">10 / 10</span>
+        <span class="draw-step2-sub">đội đã được xác định</span>
+        <span class="draw-step2-desc">
+          Tất cả đội đã sẵn sàng. Tiếp theo: phân chia vào bảng đấu để thi đấu vòng tròn.
+        </span>
+        <button class="draw-step2-btn" id="drawStep2Btn">
+          <div class="draw-step2-inner">
+            <span class="draw-step2-text">BƯỚC 2: CHIA BẢNG ĐẤU</span>
+            <span class="draw-step2-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span>
+          </div>
+        </button>
+      </div>
+
+      <!-- ── STEP 2: GROUP RESULTS ── -->
+      <div class="draw-groups-wrap" id="drawGroupsWrap" hidden>
+
+        <div class="draw-phase-header">
+          <span class="draw-phase-label" style="background:#67d5ff;color:#020c06">BƯỚC 2 / 2</span>
+          <span class="draw-phase-title">CHIA BẢNG ĐẤU</span>
+        </div>
+
+        <div class="draw-groups-layout">
+          <div class="draw-group">
+            <div class="draw-group-header">
+              BẢNG A
+              <span class="draw-group-count">5 đội</span>
+            </div>
+            <div class="draw-group-list" id="drawGroupAList"></div>
+          </div>
+          <div class="draw-group">
+            <div class="draw-group-header">
+              BẢNG B
+              <span class="draw-group-count">5 đội</span>
+            </div>
+            <div class="draw-group-list" id="drawGroupBList"></div>
+          </div>
+        </div>
+
+        <div class="draw-actions">
+          <button class="draw-reset-btn" id="drawResetBtn">↺ Bốc thăm lại từ đầu</button>
+        </div>
+
+      </div><!-- /draw-groups-wrap -->
+
+    </div><!-- /draw-arena -->
+
+  </main>
+
+  <script src="tournament-data.js?v=3"></script>
+  <script src="draw.js?v=13"></script>
+</body>
+</html>

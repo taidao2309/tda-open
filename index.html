@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,500;0,600;0,700;0,800;0,900;1,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=15">
 </head>
 <body>
   <div class="motion-guide" aria-hidden="true">
@@ -27,7 +27,7 @@
       <img class="brand-logo" src="assets/tda-logo.png" width="1147" height="848" alt="TDA Billiards">
     </a>
     <nav aria-label="Điều hướng chính">
-      <a href="#about">Giải đấu</a><a href="#players">Cơ thủ</a><a href="#teams">Chia đội</a><a href="#schedule">Lịch đấu</a><a href="#bracket">Bảng đấu</a>
+      <a href="#about">Giải đấu</a><a href="#players">Cơ thủ</a><a href="#teams">Chia đội</a><a href="draw.html">Bốc thăm</a><a href="#schedule">Lịch đấu</a><a href="#bracket">Bảng đấu</a>
     </nav>
     <a class="nav-cta" href="#register">Đăng ký <span class="mini-arrow" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 12 12 4M6 4h6v6"/></svg></span></a>
     <button class="menu-btn" aria-label="Mở menu" aria-expanded="false"><span></span><span></span></button>
@@ -102,13 +102,13 @@
     </section>
 
     <section class="schedule section" id="schedule">
-      <div class="section-head light"><div><div class="section-no">05 / LỊCH THI ĐẤU</div><h2>NHỮNG TRẬN CẦU<br><em>ĐÁNG CHỜ ĐỢI</em></h2></div><p>Lịch và kết quả được lấy từ file master.<br>Cập nhật tỷ số để bảng điểm tự tính lại.</p></div>
+      <div class="section-head light"><div><div class="section-no">06 / LỊCH THI ĐẤU</div><h2>NHỮNG TRẬN CẦU<br><em>ĐÁNG CHỜ ĐỢI</em></h2></div><p>Lịch và kết quả được lấy từ file master.<br>Cập nhật tỷ số để bảng điểm tự tính lại.</p></div>
       <div class="date-tabs" id="dateTabs"></div>
       <div class="match-list" id="matchList"></div>
     </section>
 
     <section class="bracket section" id="bracket">
-      <div class="section-head"><div><div class="section-no">06 / BẢNG ĐẤU</div><h2>HÀNH TRÌNH TỚI<br><em>CHỨC VÔ ĐỊCH</em></h2></div><p class="muted">Kết quả được cập nhật từ file dữ liệu giải đấu.</p></div>
+      <div class="section-head"><div><div class="section-no">07 / BẢNG ĐẤU</div><h2>HÀNH TRÌNH TỚI<br><em>CHỨC VÔ ĐỊCH</em></h2></div><p class="muted">Kết quả được cập nhật từ file dữ liệu giải đấu.</p></div>
       <div class="bracket-board" id="bracketBoard"></div>
     </section>
 
@@ -121,7 +121,7 @@
   </main>
 
   <footer><a class="brand" href="#top"><img class="brand-icon" src="assets/billiards-mark.svg" alt=""><span>TDA <b>OPEN</b></span></a><p>© 2026 TDA Open. All rights reserved.</p><div><a href="#players">Danh sách</a><a href="#schedule">Lịch đấu</a><a href="#bracket">Bảng đấu</a></div></footer>
-  <script src="tournament-data.js"></script>
-  <script src="app.js"></script>
+  <script src="tournament-data.js?v=2"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
