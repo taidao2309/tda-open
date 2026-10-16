@@ -42,7 +42,7 @@
     const t0=performance.now(); let last=0;
     function tick(now){
       const prog=Math.min((now-t0)/dur, 1);
-      const interval=30+prog*prog*780;
+      const interval=60+prog*prog*900;
       if(now-last>=interval){
         last=now;
         const r=allPl[0|Math.random()*allPl.length];
@@ -245,7 +245,7 @@
       (function roll(now){
         if(!alive()) return;
         const prog=Math.min((now-t0)/dur,1);
-        if(now-last>=40+prog*prog*320){
+        if(now-last>=60+prog*prog*380){
           last=now;
           const ri=0|Math.random()*currentPairs.length;
           const rp=currentPairs[ri];
