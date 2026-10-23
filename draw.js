@@ -191,33 +191,14 @@
     wrap.removeAttribute('hidden');
     listA.innerHTML=''; listB.innerHTML='';
 
-    // Rows are laid out up front as hidden placeholders, then revealed one at a time: A1, B1, A2, B2 ...
     const allCards=document.querySelectorAll('.draw-team-card');
     const lists={A:listA,B:listB};
+
+    // Build interleaved queue WITHOUT pre-rendering rows — rows are created on-demand to avoid leaking results
     const queue=[];
-    const rows={A:[],B:[]};
-    ['A','B'].forEach(g=>{
-      currentGroups[g].forEach(t=>{
-        const el=document.createElement('div');
-        el.className='draw-group-team pending';
-        el.innerHTML=
-          `<div class="draw-group-team-no">
-            <span class="draw-gteam-word">ĐỘI</span>
-            <span class="draw-group-idx">${String(t.i+1).padStart(2,'0')}</span>
-          </div>
-          <div class="draw-group-players">
-            ${t.p.map(p=>`<span class="draw-group-player">
-              <span class="draw-group-player-rank rank-color-${p.rank}">${p.rank}</span>
-              <span class="draw-group-player-name">${p.name}</span>
-            </span>`).join('')}
-          </div>`;
-        lists[g].appendChild(el);
-        rows[g].push({el,t,g});
-      });
-      setGroupCount(g,0);
-    });
-    const longest=Math.max(rows.A.length, rows.B.length);
-    for(let k=0;k<longest;k++) ['A','B'].forEach(g=>{ if(rows[g][k]) queue.push(rows[g][k]); });
+    ['A','B'].forEach(g=>setGroupCount(g,0));
+    const longest=Math.max(currentGroups.A.length, currentGroups.B.length);
+    for(let k=0;k<longest;k++) ['A','B'].forEach(g=>{ if(currentGroups[g][k]) queue.push({t:currentGroups[g][k],g}); });
 
     const runId=++groupRunId;
     const shown={A:0,B:0};
@@ -228,52 +209,73 @@
       if(!alive()) return;
       if(n>=queue.length){ wrap.classList.add('done'); return; }
 
-      const {el,t,g}=queue[n];
-      const idxEl=el.querySelector('.draw-group-idx');
-      const finalIdx=idxEl.textContent;
+      const {t,g}=queue[n];
       const isLast=n===queue.length-1;
-      el.classList.add('drawing','g-'+g.toLowerCase());
 
-      // References for slot-machine cycling
+      // Create row only now — nothing was pre-rendered, so no data leaks while waiting
+      const el=document.createElement('div');
+      el.className='draw-group-team drawing g-'+g.toLowerCase();
+      el.innerHTML=
+        `<div class="draw-group-team-no">
+          <span class="draw-gteam-word">ĐỘI</span>
+          <span class="draw-group-idx">??</span>
+        </div>
+        <div class="draw-group-players">
+          ${t.p.map(()=>`<span class="draw-group-player">
+            <span class="draw-group-player-rank">?</span>
+            <span class="draw-group-player-name">—</span>
+          </span>`).join('')}
+        </div>`;
+      lists[g].appendChild(el);
+
+      const idxEl=el.querySelector('.draw-group-idx');
+      const finalIdx=String(t.i+1).padStart(2,'0');
       const playerEls=[...el.querySelectorAll('.draw-group-player')];
       const rankEls=playerEls.map(p=>p.querySelector('.draw-group-player-rank'));
       const nameEls=playerEls.map(p=>p.querySelector('.draw-group-player-name'));
-
-      // The team number AND player names roll through random values, slowing before they land.
-      const t0=performance.now(); let last=0;
       const dur=isLast?SPIN_MS+900:SPIN_MS;
-      (function roll(now){
+
+      // Let entrance animation play (300ms), then start slot machine
+      setTimeout(()=>{
         if(!alive()) return;
-        const prog=Math.min((now-t0)/dur,1);
-        if(now-last>=60+prog*prog*380){
-          last=now;
-          const ri=0|Math.random()*currentPairs.length;
-          const rp=currentPairs[ri];
-          idxEl.textContent=String(ri+1).padStart(2,'0');
-          nameEls.forEach((nEl,i)=>{
-            const p=rp[i]||rp[0];
-            rankEls[i].textContent=p.rank;
-            rankEls[i].className='draw-group-player-rank rank-color-'+p.rank;
-            nEl.textContent=p.name;
+        const t0=performance.now(); let last=0;
+        (function roll(now){
+          if(!alive()) return;
+          const prog=Math.min((now-t0)/dur,1);
+          if(now-last>=60+prog*prog*380){
+            last=now;
+            const ri=0|Math.random()*currentPairs.length;
+            const rp=currentPairs[ri];
+            idxEl.textContent=String(ri+1).padStart(2,'0');
+            nameEls.forEach((nEl,i)=>{
+              const p=rp[i]||rp[0];
+              rankEls[i].textContent=p.rank;
+              rankEls[i].className='draw-group-player-rank rank-color-'+p.rank;
+              nEl.textContent=p.name;
+            });
+          }
+          if(prog<1){ requestAnimationFrame(roll); return; }
+
+          // Landing: restore correct final values
+          idxEl.textContent=finalIdx;
+          t.p.forEach((p,i)=>{
+            if(nameEls[i]) nameEls[i].textContent=p.name;
+            if(rankEls[i]){ rankEls[i].textContent=p.rank; rankEls[i].className='draw-group-player-rank rank-color-'+p.rank; }
           });
-        }
-        if(prog<1){ requestAnimationFrame(roll); return; }
+          el.classList.remove('drawing');
+          el.classList.add('slide-in','landed');
+          shown[g]++;
+          setGroupCount(g,shown[g]);
 
-        idxEl.textContent=finalIdx;
-        el.classList.remove('pending','drawing');
-        el.classList.add('slide-in','landed');
-        shown[g]++;
-        setGroupCount(g,shown[g]);
+          const card=allCards[t.i];
+          if(card){
+            card.classList.add('group-'+g.toLowerCase());
+            card.querySelector('.draw-card-group-badge').textContent='Bảng '+g;
+          }
 
-        // Tag the card with its group
-        const card=allCards[t.i];
-        if(card){
-          card.classList.add('group-'+g.toLowerCase());
-          card.querySelector('.draw-card-group-badge').textContent='Bảng '+g;
-        }
-
-        setTimeout(()=>{ if(alive()) revealNext(n+1); }, HOLD_MS);
-      })(performance.now());
+          setTimeout(()=>{ if(alive()) revealNext(n+1); }, HOLD_MS);
+        })(performance.now());
+      }, 300);
     }
 
     setTimeout(()=>revealNext(0), 900);
