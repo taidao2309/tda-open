@@ -1,8 +1,3 @@
-/**
- * TDA OPEN 2026 — MASTER DATA
- * Chỉ chỉnh sửa dữ liệu giải đấu trong file này.
- * Không cần sửa app.js hoặc index.html.
- */
 window.TDA_TOURNAMENT = {
   settings: {
     tournamentName: 'TDA Open 2026',
@@ -11,7 +6,6 @@ window.TDA_TOURNAMENT = {
     groups: ['A', 'B']
   },
 
-  // rank hợp lệ: S, A, B, C, D, F
   players: [
     { id: 'P01', name: 'Cơ thủ 1', rank: 'S' },
     { id: 'P02', name: 'Cơ thủ 2', rank: 'F' },
@@ -35,7 +29,6 @@ window.TDA_TOURNAMENT = {
     { id: 'P20', name: 'Cơ thủ 20', rank: 'C' }
   ],
 
-  // Sau khi bắt cặp, điền playerId tương ứng vào từng đội.
   teams: [
     { id: 'T01', name: 'Đội 1', group: 'B', playerIds: ['P01', 'P02'] },
     { id: 'T02', name: 'Đội 2', group: 'B', playerIds: ['P03', 'P04'] },
@@ -49,7 +42,6 @@ window.TDA_TOURNAMENT = {
     { id: 'T10', name: 'Đội 10', group: 'B', playerIds: ['P19', 'P20'] }
   ],
 
-  // scoreHome/scoreAway: để null nếu trận chưa đấu. Đội thắng được +1 điểm.
   matches: {
     group: [
       { no: 1, table: 1, group: 'B', home: 'T02', away: 'T07', scoreHome: null, scoreAway: null },

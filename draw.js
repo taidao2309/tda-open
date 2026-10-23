@@ -2,7 +2,7 @@
   const players = window.TDA_TOURNAMENT.players;
   const RANK_VAL = {S:1, A:2, B:3, C:4, D:5, F:6};
   const NATURAL  = [['S','F'], ['A','D'], ['B','C']];
-  let currentPairs = [], currentGroups = {A:[], B:[]};
+  let currentPairs = [], currentGroups = {A:[], B:[]}, currentSchedule = [];
 
   function shuffle(a){
     const b=[...a];
@@ -207,7 +207,7 @@
 
     function revealNext(n){
       if(!alive()) return;
-      if(n>=queue.length){ wrap.classList.add('done'); return; }
+      if(n>=queue.length){ wrap.classList.add('done'); currentSchedule=generateSchedule(); return; }
 
       const {t,g}=queue[n];
       const isLast=n===queue.length-1;
@@ -281,6 +281,138 @@
     setTimeout(()=>revealNext(0), 900);
   }
 
+  /* ── Round-robin schedule generator ── */
+  function buildRoundRobin(teams){
+    const arr=[...teams];
+    if(arr.length%2!==0) arr.push(null); // bye slot
+    const m=arr.length;
+    const rotating=arr.slice(1);
+    const rounds=[];
+    for(let r=0;r<m-1;r++){
+      const current=[arr[0],...rotating];
+      const round=[];
+      for(let i=0;i<m/2;i++){
+        const h=current[i], a=current[m-1-i];
+        if(h!==null && a!==null) round.push([h,a]);
+      }
+      rounds.push(round);
+      rotating.unshift(rotating.pop()); // rotate: move last to front
+    }
+    return rounds;
+  }
+
+  function generateSchedule(){
+    const roundsB=buildRoundRobin(currentGroups.B);
+    const roundsA=buildRoundRobin(currentGroups.A);
+    const matches=[];
+    let no=1;
+    const nr=Math.max(roundsA.length,roundsB.length);
+    for(let r=0;r<nr;r++){
+      // Group B on tables 1-2, Group A on tables 3-4
+      (roundsB[r]||[]).forEach((pair,i)=>{
+        matches.push({no:no++,table:i+1,group:'B',
+          home:'T'+String(pair[0].i+1).padStart(2,'0'),
+          away:'T'+String(pair[1].i+1).padStart(2,'0'),
+          scoreHome:null,scoreAway:null});
+      });
+      (roundsA[r]||[]).forEach((pair,i)=>{
+        matches.push({no:no++,table:i+3,group:'A',
+          home:'T'+String(pair[0].i+1).padStart(2,'0'),
+          away:'T'+String(pair[1].i+1).padStart(2,'0'),
+          scoreHome:null,scoreAway:null});
+      });
+    }
+    return matches;
+  }
+
+  /* ── Export tournament-data.js ── */
+  function exportData(){
+    const src=window.TDA_TOURNAMENT;
+    const teams=currentPairs.map((pair,i)=>{
+      const n=String(i+1).padStart(2,'0');
+      let g='A';
+      for(const [grp,arr] of Object.entries(currentGroups)){
+        if(arr.some(t=>t.i===i)){g=grp;break;}
+      }
+      return{id:'T'+n,name:'Đội '+n,group:g,playerIds:pair.map(p=>p.id)};
+    });
+    const groupMatches=generateSchedule();
+
+    function indent(obj,pad){
+      return JSON.stringify(obj,null,2).split('\n').map((l,i)=>i?pad+l:l).join('\n');
+    }
+
+    const out=
+`
+window.TDA_TOURNAMENT = {
+  settings: ${indent(src.settings,'  ')},
+
+  players: ${indent(src.players,'  ')},
+
+  teams: ${indent(teams,'  ')},
+
+  matches: {
+    group: ${indent(groupMatches,'    ')},
+    semifinal: ${indent(src.matches.semifinal,'    ')},
+    final: ${indent(src.matches.final,'    ')}
+  }
+};
+`;
+    const blob=new Blob([out],{type:'text/javascript'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='tournament-data.js';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  /* ── Schedule preview ── */
+  function renderSchedulePreview(){
+    const preview=document.querySelector('#drawSchedulePreview');
+    const btn=document.querySelector('#drawPreviewBtn');
+    if(!preview) return;
+
+    const isHidden=preview.hasAttribute('hidden');
+    if(!isHidden){ preview.setAttribute('hidden',''); if(btn) btn.textContent='Preview lịch đấu'; return; }
+
+    preview.removeAttribute('hidden');
+    if(btn) btn.textContent='Ẩn lịch đấu';
+    if(preview.dataset.rendered) return; // already built
+    preview.dataset.rendered='1';
+
+    const RANK_COLOR={S:'#c8f536',A:'#ffd166',B:'#67d5ff',C:'#66e0b5',D:'#c3a6ff',F:'#ff9c7a'};
+
+    function teamCell(tid){
+      const idx=parseInt(tid.slice(1),10)-1;
+      const pair=currentPairs[idx]||[];
+      return `<div class="sp-team"><span class="sp-tid">Đội ${tid.slice(1)}</span><div class="sp-players">${
+        pair.map(p=>`<span class="sp-player"><b class="sp-rank" style="background:${RANK_COLOR[p.rank]||'#888'};color:#07110d">${p.rank}</b>${p.name}</span>`).join('')
+      }</div></div>`;
+    }
+
+    const ROUND=4;
+    let html='<div class="sp-wrap">';
+    for(let i=0;i<currentSchedule.length;i+=ROUND){
+      const round=currentSchedule.slice(i,i+ROUND);
+      html+=`<div class="sp-round"><div class="sp-round-label">Vòng ${i/ROUND+1}</div>`;
+      round.forEach(m=>{
+        const ga=m.group==='A';
+        html+=`<div class="sp-match sp-g-${m.group.toLowerCase()}">
+          <span class="sp-no">${String(m.no).padStart(2,'0')}</span>
+          <span class="sp-table">Bàn ${m.table}</span>
+          <span class="sp-gbadge" style="color:${ga?'var(--acid)':'#67d5ff'}">${m.group}</span>
+          ${teamCell(m.home)}
+          <span class="sp-vs">VS</span>
+          ${teamCell(m.away)}
+        </div>`;
+      });
+      html+='</div>';
+    }
+    html+='</div>';
+    preview.innerHTML=html;
+  }
+
   /* ── Reset to intro ── */
   function resetDraw(){
     const intro     = document.querySelector('#drawIntro');
@@ -317,4 +449,8 @@
   if(startBtn) startBtn.addEventListener('click', startDraw);
   if(step2Btn) step2Btn.addEventListener('click', showGroups);
   if(resetBtn) resetBtn.addEventListener('click', resetDraw);
+  const exportBtn=document.querySelector('#drawExportBtn');
+  if(exportBtn) exportBtn.addEventListener('click', exportData);
+  const previewBtn=document.querySelector('#drawPreviewBtn');
+  if(previewBtn) previewBtn.addEventListener('click', renderSchedulePreview);
 })();
