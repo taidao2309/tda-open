@@ -108,8 +108,8 @@ function renderMotion(){
     });
   }
   if(!reduceMotion&&window.innerWidth>900){
-    heroTitle.style.transform=`translate3d(${heroP*-72}px,${heroP*10}px,0) rotate(${heroP*-1.2}deg)`;
-    heroYear.style.transform=`translate3d(${heroP*92}px,${heroP*14}px,0) rotate(${heroP*1.5}deg)`;
+    heroTitle.style.transform=`translate3d(${heroP*-120}px,${heroP*28}px,0) rotate(${heroP*-2.5}deg) scale(${1-heroP*.18})`;
+    heroYear.style.transform=`translate3d(${heroP*150}px,${heroP*38}px,0) rotate(${heroP*3}deg) scale(${1-heroP*.18})`;
     orbitOne.style.transform=`translate3d(${heroP*22}px,${heroP*-15}px,0) rotate(${heroP*12}deg)`;
     orbitTwo.style.transform=`translate3d(${heroP*-16}px,${heroP*10}px,0) rotate(${heroP*-9}deg)`;
     shade.style.opacity=String(1-heroP*.2);
