@@ -89,6 +89,7 @@ const heroPhoto=document.querySelector('.hero-photo'), heroContent=document.quer
 const orbitOne=document.querySelector('.orbit-one'), orbitTwo=document.querySelector('.orbit-two');
 const heroTitle=document.querySelector('.hero h1 span'), heroYear=document.querySelector('.hero h1 strong');
 const motionGuide=document.querySelector('.motion-guide'), guideBall=document.querySelector('.guide-ball');
+const registerSection=document.querySelector('#register');
 const formatTitle=document.querySelector('.format-title');
 const formatSection=document.querySelector('.format');
 const formatSteps=document.querySelectorAll('.format-steps article');
@@ -113,7 +114,9 @@ function renderMotion(){
     orbitTwo.style.transform=`translate3d(${heroP*-16}px,${heroP*10}px,0) rotate(${heroP*-9}deg)`;
     shade.style.opacity=String(1-heroP*.2);
     const progress=Math.min(Math.max((motionCurrent-vh*.72)/(doc-vh*.9),0),1);
-    const show=progress>0&&progress<.97;
+    const registerRect=registerSection?.getBoundingClientRect();
+    const registerVisible=registerRect&&registerRect.top<vh&&registerRect.bottom>0;
+    const show=progress>0&&progress<.97&&!registerVisible;
     motionGuide.classList.toggle('visible',show);
     if(show){
       const x=(.88-0.76*progress+Math.sin(progress*Math.PI*3)*.15)*window.innerWidth;

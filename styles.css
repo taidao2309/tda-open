@@ -462,3 +462,8 @@
   .draw-slot.spinning .draw-slot-name,.draw-slot.spinning:after,.draw-group-team{animation:none!important}
   .draw-step-dot{animation:none!important}
 }
+
+footer{display:flex;justify-content:space-between;position:relative}
+footer>p{position:absolute;left:50%;top:50%;margin:0;transform:translate(-50%,-50%);text-align:center;white-space:nowrap}
+@media(max-width:900px){footer{flex-direction:column;gap:18px;text-align:center}footer>p{position:static;transform:none;white-space:normal}footer>div{justify-content:center}}
+
