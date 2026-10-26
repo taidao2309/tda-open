@@ -63,7 +63,7 @@ const bracketScore=value=>Number.isFinite(value)?value:'—';
 function renderBracket(){
   const semifinals=matches.semifinal||[],finalMatch=(matches.final||[])[0];
   const semifinalHtml=semifinals.length?semifinals.map(match=>`<div class="duel"><p><b>${bracketName(match.home)}</b><span>${bracketScore(match.scoreHome)}</span></p><p><b>${bracketName(match.away)}</b><span>${bracketScore(match.scoreAway)}</span></p></div>`).join(''):'<div class="duel"><p><b>?</b><span>—</span></p></div>';
-  const finalHtml=finalMatch?`<div class="duel featured"><p><b>${bracketName(finalMatch.home)}</b><span>${bracketScore(finalMatch.scoreHome)}</span></p><p><b>${bracketName(finalMatch.away)}</b><span>${bracketScore(finalMatch.scoreAway)}</span></p><small>Bàn ${String(finalMatch.table||1).padStart(2,'0')} · Chưa thi đấu</small></div>`:'<div class="duel featured"><p><b>?</b><span>—</span></p></div>';
+  const finalHtml=finalMatch?`<div class="duel featured"><p><b>${bracketName(finalMatch.home)}</b><span>${bracketScore(finalMatch.scoreHome)}</span></p><p><b>${bracketName(finalMatch.away)}</b><span>${bracketScore(finalMatch.scoreAway)}</span></p></div>`:'<div class="duel featured"><p><b>?</b><span>—</span></p></div>';
   let champion='?';
   if(finalMatch&&Number.isFinite(finalMatch.scoreHome)&&Number.isFinite(finalMatch.scoreAway)&&finalMatch.scoreHome!==finalMatch.scoreAway){champion=bracketName(finalMatch.scoreHome>finalMatch.scoreAway?finalMatch.home:finalMatch.away)}
   bracketBoard.innerHTML=`<div class="round"><h3>BÁN KẾT <span>01</span></h3>${semifinalHtml}</div><div class="round final-round"><h3>CHUNG KẾT <span>02</span></h3>${finalHtml}</div><div class="champion"><span>NHÀ VÔ ĐỊCH</span><div class="trophy">♛</div><h3>${champion==='?'?'?':champion}</h3></div>`;
