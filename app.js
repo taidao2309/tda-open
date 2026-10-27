@@ -30,7 +30,7 @@ function renderGroup(group){
   const groupTeams=teams.filter(team=>team.group===group);
   teamList.innerHTML=groupTeams.map(team=>{
     const members=team.playerIds.map(playerById).filter(Boolean);
-     return `<article class="team-card"><div class="team-id"><span>${team.id}</span><b>${team.name}</b></div><div class="team-members">${members.length?members.map(player=>`<p><span>${player.name}</span><i class="rank-${player.rank}">Rank ${player.rank}</i></p>`).join(''):'<p class="waiting">Chưa chia cơ thủ</p>'}</div></article>`;
+     const ballNo=parseInt(team.id.slice(1),10);return `<article class="team-card"><div class="team-id"><div class="draw-ball" data-ball="${ballNo}"><span>${ballNo}</span></div><b>${team.name}</b></div><div class="team-members">${members.length?members.map(player=>`<p><span>${player.name}</span><i class="rank-${player.rank}">Rank ${player.rank}</i></p>`).join(''):'<p class="waiting">Chưa chia cơ thủ</p>'}</div></article>`;
   }).join('');
   const stats=groupTeams.map(team=>({team,played:0,won:0,lost:0,points:0}));
   matches.group.filter(match=>match.group===group && Number.isFinite(match.scoreHome) && Number.isFinite(match.scoreAway)).forEach(match=>{
