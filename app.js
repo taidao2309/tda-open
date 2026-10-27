@@ -98,6 +98,12 @@ function renderMotion(){
   motionCurrent+=(motionTarget-motionCurrent)*.13;
   const vh=window.innerHeight,doc=Math.max(document.documentElement.scrollHeight-vh,1);
   const heroP=Math.min(Math.max(motionCurrent/(vh*.92),0),1);
+  const introSection=document.querySelector('.intro');
+  if(introSection){
+    const introTop=introSection.getBoundingClientRect().top;
+    const introProgress=Math.min(Math.max((vh*.86-introTop)/(vh*.72),0),1);
+    introSection.style.setProperty('--intro-progress',introProgress.toFixed(3));
+  }
   if(formatTitle&&formatSection){
     const formatTop=formatSection.getBoundingClientRect().top;
     const formatProgress=Math.min(Math.max((vh*.86-formatTop)/(vh*.72),0),1);
@@ -131,4 +137,4 @@ function requestMotion(){if(!rafActive){rafActive=true;requestAnimationFrame(ren
 window.addEventListener('scroll',requestMotion,{passive:true});window.addEventListener('resize',requestMotion,{passive:true});requestMotion();
 
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.animate([{opacity:0,transform:'translate3d(0,26px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],{duration:720,delay:Math.min(+(entry.target.dataset.motionIndex||0)*45,270),easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});entry.target.classList.add('motion-in');observer.unobserve(entry.target)}}),{threshold:.08,rootMargin:'0px 0px -5%'});
-document.querySelectorAll('section:not(.hero):not(.ticker):not(.format) h2,.player-card,.team-card,.match,.duel,.bracket-board').forEach((el,index)=>{el.dataset.motionIndex=index%6;observer.observe(el)});
+document.querySelectorAll('section:not(.hero):not(.ticker):not(.format) h2, .intro .section-no, .intro .kicker, .intro .lead, .stats article, .player-card,.team-card,.match,.duel,.bracket-board').forEach((el,index)=>{el.dataset.motionIndex=index%6;observer.observe(el)});
