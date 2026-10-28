@@ -7,12 +7,12 @@ window.TDA_TOURNAMENT = {
   },
 
   players: [
-    { id: 'P01', name: 'Cơ thủ 1', rank: 'S' },
-    { id: 'P02', name: 'Cơ thủ 2', rank: 'F' },
-    { id: 'P03', name: 'Cơ thủ 3', rank: 'S' },
-    { id: 'P04', name: 'Cơ thủ 4', rank: 'F' },
-    { id: 'P05', name: 'Cơ thủ 5', rank: 'A' },
-    { id: 'P06', name: 'Cơ thủ 6', rank: 'D' },
+    { id: 'P01', name: 'Nguyễn Phương Thái', rank: 'S' },
+    { id: 'P02', name: 'Khúc Chí Phát', rank: 'C' },
+    { id: 'P03', name: 'Đào Văn Tài', rank: 'B' },
+    { id: 'P04', name: 'Trần Đình Lực', rank: 'C' },
+    { id: 'P05', name: 'Trịnh Quốc Tuấn', rank: 'D' },
+    { id: 'P06', name: 'Đào Phương Nguyên', rank: 'F' },
     { id: 'P07', name: 'Cơ thủ 7', rank: 'A' },
     { id: 'P08', name: 'Cơ thủ 8', rank: 'D' },
     { id: 'P09', name: 'Cơ thủ 9', rank: 'B' },
