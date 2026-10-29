@@ -6,6 +6,8 @@ Landing page tĩnh, responsive, sẵn sàng deploy lên Vercel.
 
 ```bash
 python3 -m http.server 4173
+
+python -m http.server 4173
 ```
 
 Mở `http://localhost:4173`.
