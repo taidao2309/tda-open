@@ -19,7 +19,7 @@ window.TDA_TOURNAMENT = {
     { id: 'P10', name: 'Đào Phương Nguyên', rank: 'F' },
     { id: 'P11', name: 'Nguyễn Văn Hải', rank: 'C' },
     { id: 'P12', name: 'Đặng Văn Long', rank: 'S' },
-    { id: 'P13', name: 'Nguyễn Đình Hải', rank: 'A' },
+    { id: 'P13', name: 'Cơ thủ 13', rank: 'A' },
     { id: 'P14', name: 'Nguyễn Hữu Lâm', rank: 'C' },
     { id: 'P15', name: 'Đinh Văn Khiết', rank: 'S' },
     { id: 'P16', name: 'Cơ thủ 16', rank: 'D' },
