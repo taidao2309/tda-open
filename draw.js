@@ -11,20 +11,15 @@
   }
 
   function buildPairs(pl){
+    // Shuffle within each rank for randomness, then sort all players strongest→weakest
     const byR={};
     for(const p of pl){if(!byR[p.rank])byR[p.rank]=[];byR[p.rank].push(p)}
     for(const r in byR) byR[r]=shuffle(byR[r]);
-    const used=new Set(), pairs=[];
-    for(const[hi,lo]of NATURAL){
-      const hp=(byR[hi]||[]).filter(p=>!used.has(p.id));
-      const lp=(byR[lo]||[]).filter(p=>!used.has(p.id));
-      const n=Math.min(hp.length,lp.length);
-      for(let i=0;i<n;i++){pairs.push([hp[i],lp[i]]);used.add(hp[i].id);used.add(lp[i].id)}
-    }
-    // Pair leftover players: highest rank vs lowest rank
-    const left=pl.filter(p=>!used.has(p.id)).sort((a,b)=>RANK_VAL[a.rank]-RANK_VAL[b.rank]);
-    let l=0, r=left.length-1;
-    while(l<r){pairs.push([left[l],left[r]]);l++;r--}
+    const sorted=['S','A','B','C','D','F'].flatMap(r=>byR[r]||[]);
+    // Pair position 0 (strongest) with position N-1 (weakest), always
+    const pairs=[];
+    let lo=0, hi=sorted.length-1;
+    while(lo<hi){pairs.push([sorted[lo],sorted[hi]]);lo++;hi--;}
     return shuffle(pairs);
   }
 
@@ -367,6 +362,45 @@ window.TDA_TOURNAMENT = {
     URL.revokeObjectURL(url);
   }
 
+  /* ── Export Excel ── */
+  function exportExcel(){
+    const tNo=i=>`Đội ${i+1}`;
+
+    // Table 1: Teams
+    let rows1='<tr><th>Đội</th><th>Cơ Thủ 1</th><th>Rank</th><th>Cơ Thủ 2</th><th>Rank</th></tr>';
+    currentPairs.forEach((pair,i)=>{
+      rows1+=`<tr><td>${tNo(i)}</td><td>${pair[0].name}</td><td>${pair[0].rank}</td><td>${pair[1].name}</td><td>${pair[1].rank}</td></tr>`;
+    });
+
+    // Table 2: Schedule
+    let rows2='<tr><th>Trận</th><th>Bàn</th><th>Đội A</th><th>Đội B</th><th>Tỉ Số A</th><th>Tỉ Số B</th></tr>';
+    currentSchedule.forEach(m=>{
+      const home=tNo(parseInt(m.home.slice(1),10)-1);
+      const away=tNo(parseInt(m.away.slice(1),10)-1);
+      rows2+=`<tr><td>${m.no}</td><td>${m.table}</td><td>${home}</td><td>${away}</td><td></td><td></td></tr>`;
+    });
+
+    const xls=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
+<head><meta charset="UTF-8">
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>
+<x:ExcelWorksheet><x:Name>Chia Đội</x:Name><x:WorksheetOptions><x:Selected/></x:WorksheetOptions></x:ExcelWorksheet>
+<x:ExcelWorksheet><x:Name>Lịch Đấu</x:Name></x:ExcelWorksheet>
+</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+</head><body>
+<table>${rows1}</table>
+<br>
+<table>${rows2}</table>
+</body></html>`;
+
+    const blob=new Blob(['﻿'+xls],{type:'application/vnd.ms-excel;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='tda-open-2026.xls';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
   /* ── Schedule preview ── */
   function renderSchedulePreview(){
     const preview=document.querySelector('#drawSchedulePreview');
@@ -451,6 +485,8 @@ window.TDA_TOURNAMENT = {
   if(resetBtn) resetBtn.addEventListener('click', resetDraw);
   const exportBtn=document.querySelector('#drawExportBtn');
   if(exportBtn) exportBtn.addEventListener('click', exportData);
+  const excelBtn=document.querySelector('#drawExcelBtn');
+  if(excelBtn) excelBtn.addEventListener('click', exportExcel);
   const previewBtn=document.querySelector('#drawPreviewBtn');
   if(previewBtn) previewBtn.addEventListener('click', renderSchedulePreview);
 })();
