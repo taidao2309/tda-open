@@ -309,7 +309,7 @@
 /* Stripe overlay for 9 and 10 */
 .draw-ball[data-ball="9"]::before,.draw-ball[data-ball="10"]::before{content:"";position:absolute;left:0;right:0;top:30%;height:40%;background:rgba(255,255,255,.86);z-index:1;pointer-events:none}
 .draw-ball span{width:14px;height:14px;background:#fff8e7;border-radius:50%;display:grid;place-items:center;font:900 6px var(--sans);color:#3d2e00;position:relative;z-index:2}
-.draw-card-name{font:700 8px var(--sans);letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.28)}
+.draw-card-name{font:800 11px var(--sans);letter-spacing:2px;text-transform:uppercase;color:#fff}
 .draw-card-group-badge{font:900 8px var(--sans);letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:999px;opacity:0;transition:opacity .4s .1s}
 .draw-team-card.group-a .draw-card-group-badge{background:rgba(200,245,54,.14);color:var(--acid);border:1px solid rgba(200,245,54,.28);opacity:1}
 .draw-team-card.group-b .draw-card-group-badge{background:rgba(103,213,255,.1);color:#67d5ff;border:1px solid rgba(103,213,255,.22);opacity:1}
