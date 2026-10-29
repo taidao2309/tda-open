@@ -24,11 +24,13 @@
   }
 
   function assignGroups(pairs){
-    // Sort by combined strength (stronger teams first), snake-draft A/B
+    // Spread teams by strength, but randomly choose which group gets the extra team.
     const sorted=[...pairs].map((p,i)=>({i,p,str:p.reduce((s,x)=>s+RANK_VAL[x.rank],0)}))
       .sort((a,b)=>a.str-b.str);
     const G={A:[],B:[]};
-    sorted.forEach((t,i)=>G[i%2===0?'A':'B'].push(t));
+    const firstGroup=Math.random()<.5?'A':'B';
+    const secondGroup=firstGroup==='A'?'B':'A';
+    sorted.forEach((t,i)=>G[i%2===0?firstGroup:secondGroup].push(t));
     return G;
   }
 
@@ -74,7 +76,7 @@
     });
   }
 
-  const BALL_COLORS=['#f5c400','#1a70d8','#d82020','#7030c0','#e07020','#207820','#901818','#444','#f5c400','#1a70d8'];
+  const BALL_COLORS=['#f5c400','#1a70d8','#d82020','#7030c0','#e07020','#207820','#901818','#444','#f5c400','#1a70d8','#d82020'];
 
   function makeCard(idx){
     const el=document.createElement('div');
@@ -299,25 +301,32 @@
   function generateSchedule(){
     const roundsB=buildRoundRobin(currentGroups.B);
     const roundsA=buildRoundRobin(currentGroups.A);
-    const matches=[];
-    let no=1;
+    const fixtures=[];
     const nr=Math.max(roundsA.length,roundsB.length);
     for(let r=0;r<nr;r++){
-      // Group B on tables 1-2, Group A on tables 3-4
-      (roundsB[r]||[]).forEach((pair,i)=>{
-        matches.push({no:no++,table:i+1,group:'B',
+      (roundsB[r]||[]).forEach(pair=>{
+        fixtures.push({group:'B',
           home:'T'+String(pair[0].i+1).padStart(2,'0'),
           away:'T'+String(pair[1].i+1).padStart(2,'0'),
           scoreHome:null,scoreAway:null});
       });
-      (roundsA[r]||[]).forEach((pair,i)=>{
-        matches.push({no:no++,table:i+3,group:'A',
+      (roundsA[r]||[]).forEach(pair=>{
+        fixtures.push({group:'A',
           home:'T'+String(pair[0].i+1).padStart(2,'0'),
           away:'T'+String(pair[1].i+1).padStart(2,'0'),
           scoreHome:null,scoreAway:null});
       });
     }
-    return matches;
+    const sessions=[];
+    fixtures.forEach(match=>{
+      let sessionIndex=sessions.findIndex(session=>session.length<4&&
+        !session.some(game=>[game.home,game.away].some(team=>team===match.home||team===match.away)));
+      if(sessionIndex<0){sessionIndex=sessions.length;sessions.push([])}
+      sessions[sessionIndex].push(match);
+    });
+    return sessions.flatMap((session,roundIndex)=>session.map((match,tableIndex)=>(
+      {...match,round:roundIndex+1,table:tableIndex+1}
+    ))).map((match,index)=>({...match,no:index+1}));
   }
 
   /* ── Export tournament-data.js ── */
@@ -364,35 +373,31 @@ window.TDA_TOURNAMENT = {
 
   /* ── Export Excel ── */
   function exportExcel(){
-    const tNo=i=>`Đội ${i+1}`;
+    const teamLabel=i=>`${String.fromCharCode(0x0110,0x1ed9,0x69)} ${String(i+1).padStart(2,'0')}`;
+    const xmlEscape=value=>String(value??'').replace(/[&<>\"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[char])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'');
+    const cell=value=>value===''||value==null?'<Cell/>':`<Cell><Data ss:Type="${typeof value==='number'?'Number':'String'}">${xmlEscape(value)}</Data></Cell>`;
+    const worksheet=(name,rows)=>`<Worksheet ss:Name="${xmlEscape(name)}"><Table>${rows.map(row=>`<Row>${row.map(cell).join('')}</Row>`).join('')}</Table></Worksheet>`;
+    const groupA=currentGroups.A||[],groupB=currentGroups.B||[];
+    const headers=['\u0110\u1ed9i','C\u01a1 th\u1ee7 1','H\u1ea1ng','C\u01a1 th\u1ee7 2','H\u1ea1ng'];
+    const groupRows=[
+      ['B\u1ea2NG A','','','','','','B\u1ea2NG B'],
+      [...headers,'',...headers]
+    ];
+    const maxTeams=Math.max(groupA.length,groupB.length);
+    for(let i=0;i<maxTeams;i++){
+      const rowFor=t=>t?[teamLabel(t.i),t.p[0]?.name||'',t.p[0]?.rank||'',t.p[1]?.name||'',t.p[1]?.rank||'']:['','','','',''];
+      groupRows.push([...rowFor(groupA[i]),'',...rowFor(groupB[i])]);
+    }
 
-    // Table 1: Teams
-    let rows1='<tr><th>Đội</th><th>Cơ Thủ 1</th><th>Rank</th><th>Cơ Thủ 2</th><th>Rank</th></tr>';
-    currentPairs.forEach((pair,i)=>{
-      rows1+=`<tr><td>${tNo(i)}</td><td>${pair[0].name}</td><td>${pair[0].rank}</td><td>${pair[1].name}</td><td>${pair[1].rank}</td></tr>`;
-    });
+    const rosterRows=[['\u0110\u1ed9i','B\u1ea3ng','C\u01a1 th\u1ee7 1','H\u1ea1ng','C\u01a1 th\u1ee7 2','H\u1ea1ng']];
+    const groupForIndex=new Map(Object.entries(currentGroups).flatMap(([group,list])=>list.map(t=>[t.i,group])));
+    currentPairs.forEach((pair,i)=>rosterRows.push([teamLabel(i),groupForIndex.get(i)||'',pair[0]?.name||'',pair[0]?.rank||'',pair[1]?.name||'',pair[1]?.rank||'']));
 
-    // Table 2: Schedule
-    let rows2='<tr><th>Trận</th><th>Bàn</th><th>Đội A</th><th>Đội B</th><th>Tỉ Số A</th><th>Tỉ Số B</th></tr>';
-    currentSchedule.forEach(m=>{
-      const home=tNo(parseInt(m.home.slice(1),10)-1);
-      const away=tNo(parseInt(m.away.slice(1),10)-1);
-      rows2+=`<tr><td>${m.no}</td><td>${m.table}</td><td>${home}</td><td>${away}</td><td></td><td></td></tr>`;
-    });
+    const matchRows=[['Tr\u1eadn','V\u00f2ng','B\u1ea3ng','B\u00e0n','\u0110\u1ed9i nh\u00e0','\u0110\u1ed9i kh\u00e1ch','T\u1ec9 s\u1ed1 nh\u00e0','T\u1ec9 s\u1ed1 kh\u00e1ch']];
+    currentSchedule.forEach(m=>matchRows.push([m.no,m.round,m.group,m.table,teamLabel(parseInt(m.home.slice(1),10)-1),teamLabel(parseInt(m.away.slice(1),10)-1),'','']));
 
-    const xls=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
-<head><meta charset="UTF-8">
-<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>
-<x:ExcelWorksheet><x:Name>Chia Đội</x:Name><x:WorksheetOptions><x:Selected/></x:WorksheetOptions></x:ExcelWorksheet>
-<x:ExcelWorksheet><x:Name>Lịch Đấu</x:Name></x:ExcelWorksheet>
-</x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
-</head><body>
-<table>${rows1}</table>
-<br>
-<table>${rows2}</table>
-</body></html>`;
-
-    const blob=new Blob(['﻿'+xls],{type:'application/vnd.ms-excel;charset=utf-8'});
+    const workbook=`<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">${worksheet('Groups',groupRows)}${worksheet('Teams',rosterRows)}${worksheet('Schedule',matchRows)}</Workbook>`;
+    const blob=new Blob([workbook],{type:'application/vnd.ms-excel;charset=utf-8'});
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url; a.download='tda-open-2026.xls';
@@ -425,11 +430,14 @@ window.TDA_TOURNAMENT = {
       }</div></div>`;
     }
 
-    const ROUND=4;
     let html='<div class="sp-wrap">';
-    for(let i=0;i<currentSchedule.length;i+=ROUND){
-      const round=currentSchedule.slice(i,i+ROUND);
-      html+=`<div class="sp-round"><div class="sp-round-label">Vòng ${i/ROUND+1}</div>`;
+    const scheduleRounds=[];
+    currentSchedule.forEach((match,index)=>{
+      const roundNo=match.round||Math.floor(index/4)+1;
+      (scheduleRounds[roundNo-1]||(scheduleRounds[roundNo-1]=[])).push(match);
+    });
+    scheduleRounds.forEach((round,index)=>{
+      html+=`<div class="sp-round"><div class="sp-round-label">Vòng ${index+1}</div>`;
       round.forEach(m=>{
         const ga=m.group==='A';
         html+=`<div class="sp-match sp-g-${m.group.toLowerCase()}">
@@ -442,7 +450,7 @@ window.TDA_TOURNAMENT = {
         </div>`;
       });
       html+='</div>';
-    }
+    });
     html+='</div>';
     preview.innerHTML=html;
   }

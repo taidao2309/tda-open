@@ -44,13 +44,13 @@ function renderGroup(group){
 groupSwitch.addEventListener('click',event=>{if(event.target.matches('button'))renderGroup(event.target.dataset.group)});renderGroup('A');
 
 const tabs=document.querySelector('#dateTabs'), list=document.querySelector('#matchList');
-const phases={group:'Vòng bảng (20)',semifinal:'Bán kết (2)',final:'Chung kết'};
+const phases={group:'Vòng bảng (25)',semifinal:'Bán kết (2)',final:'Chung kết'};
 function renderMatches(phase){
   tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.phase===phase));
   list.innerHTML=matches[phase].map(m=>{
     const played=Number.isFinite(m.scoreHome)&&Number.isFinite(m.scoreAway);
     const score=played?`${m.scoreHome} — ${m.scoreAway}`:'—';
-    const meta=phase==='group'?`Bảng ${m.group} · Bàn ${String(m.table).padStart(2,'0')}`:`Bàn ${String(m.table).padStart(2,'0')}`;
+    const meta=phase==='group'?`${m.round?`V\u00f2ng ${m.round} \u00b7 `:''}B\u1ea3ng ${m.group} \u00b7 B\u00e0n ${String(m.table).padStart(2,'0')}`:`B\u00e0n ${String(m.table).padStart(2,'0')}`;
     return `<article class="match"><span class="match-index"><small>Trận</small>${String(m.no).padStart(2,'0')}</span><span class="team">${teamLabel(m.home)}</span><span class="score ${played?'played':''}">${score}</span><span class="team away">${teamLabel(m.away)}</span><span class="table">${meta}</span></article>`;
   }).join('');
 }

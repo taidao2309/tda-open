@@ -20,7 +20,7 @@ Toàn bộ dữ liệu giải đấu được quản lý tại **`tournament-dat
 
 - `settings`: cấu hình chung của giải.
 - `players`: danh sách cơ thủ và rank.
-- `teams`: 10 đội, mỗi đội gồm hai `playerId`, thuộc bảng A hoặc B.
+- `teams`: 11 đội, mỗi đội gồm hai `playerId`, thuộc bảng A hoặc B.
 - `matches`: lịch, bàn thi đấu và tỷ số.
 
 Không đặt dữ liệu giải đấu trong `app.js`; file này chỉ xử lý giao diện. Sau khi sửa
