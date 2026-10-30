@@ -3,6 +3,7 @@
   const RANK_VAL = {S:1, A:2, B:3, C:4, D:5, F:6};
   const NATURAL  = [['S','F'], ['A','D'], ['B','C']];
   let currentPairs = [], currentGroups = {A:[], B:[]}, currentSchedule = [];
+  let priorityPairs = [], pendingPlayer = null;
 
   function shuffle(a){
     const b=[...a];
@@ -11,16 +12,16 @@
   }
 
   function buildPairs(pl){
-    // Shuffle within each rank for randomness, then sort all players strongest→weakest
+    const prioritizedIds=new Set(priorityPairs.flat().map(p=>p.id));
+    const remaining=pl.filter(p=>!prioritizedIds.has(p.id));
     const byR={};
-    for(const p of pl){if(!byR[p.rank])byR[p.rank]=[];byR[p.rank].push(p)}
+    for(const p of remaining){if(!byR[p.rank])byR[p.rank]=[];byR[p.rank].push(p)}
     for(const r in byR) byR[r]=shuffle(byR[r]);
     const sorted=['S','A','B','C','D','F'].flatMap(r=>byR[r]||[]);
-    // Pair position 0 (strongest) with position N-1 (weakest), always
-    const pairs=[];
+    const randomPairs=[];
     let lo=0, hi=sorted.length-1;
-    while(lo<hi){pairs.push([sorted[lo],sorted[hi]]);lo++;hi--;}
-    return shuffle(pairs);
+    while(lo<hi){randomPairs.push([sorted[lo],sorted[hi]]);lo++;hi--;}
+    return shuffle([...priorityPairs,...randomPairs]);
   }
 
   function assignGroups(pairs){
@@ -103,6 +104,77 @@
         </div>
       </div>`;
     return el;
+  }
+
+  /* ── Priority Pairs Modal ── */
+  function renderPriorityModal(){
+    const hint=document.querySelector('#ppHint');
+    const grid=document.querySelector('#ppGrid');
+    const list=document.querySelector('#ppList');
+    const count=document.querySelector('#ppCount');
+    const footCount=document.querySelector('#ppFootCount');
+    const badge=document.querySelector('#priorityBadge');
+    if(!grid) return;
+
+    const usedIds=new Set(priorityPairs.flat().map(p=>p.id));
+
+    if(pendingPlayer){
+      hint.className='pp-hint picking';
+      hint.textContent=`Đã chọn ${pendingPlayer.name} — chọn người thứ hai...`;
+    } else {
+      hint.className='pp-hint idle';
+      hint.textContent='Chọn cơ thủ thứ nhất...';
+    }
+
+    grid.innerHTML=players.map(p=>{
+      const isPending=pendingPlayer&&pendingPlayer.id===p.id;
+      const isUsed=usedIds.has(p.id);
+      return `<button class="pp-chip${isPending?' pending':''}${isUsed?' used':''}" data-id="${p.id}">
+        <span class="pp-chip-rank rank-color-${p.rank}">${p.rank}</span>
+        <span class="pp-chip-name">${p.name}</span>
+      </button>`;
+    }).join('');
+
+    list.innerHTML=priorityPairs.length
+      ?priorityPairs.map((pair,i)=>`<div class="pp-pair">
+          <span class="pp-pair-names">${pair[0].name}<span class="pp-pair-vs">VS</span>${pair[1].name}</span>
+          <button class="pp-pair-del" data-pair="${i}" aria-label="Xóa">✕</button>
+        </div>`).join('')
+      :'<span style="font:400 13px var(--sans);color:rgba(255,255,255,.25)">Chưa có cặp nào</span>';
+
+    count.textContent=priorityPairs.length;
+    if(footCount) footCount.textContent=`${priorityPairs.length} cặp ưu tiên`;
+    if(badge){priorityPairs.length?badge.classList.add('show'):badge.classList.remove('show');badge.textContent=priorityPairs.length;}
+
+    grid.querySelectorAll('.pp-chip:not(.used)').forEach(chip=>{
+      chip.addEventListener('click',()=>{
+        const player=players.find(p=>p.id===chip.dataset.id);
+        if(!player) return;
+        if(!pendingPlayer){pendingPlayer=player;}
+        else if(pendingPlayer.id===player.id){pendingPlayer=null;}
+        else{priorityPairs.push([pendingPlayer,player]);pendingPlayer=null;}
+        renderPriorityModal();
+      });
+    });
+
+    list.querySelectorAll('.pp-pair-del').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        priorityPairs.splice(parseInt(btn.dataset.pair,10),1);
+        renderPriorityModal();
+      });
+    });
+  }
+
+  function openPriorityModal(){
+    const overlay=document.querySelector('#ppOverlay');
+    if(overlay) overlay.removeAttribute('hidden');
+    renderPriorityModal();
+  }
+
+  function closePriorityModal(){
+    const overlay=document.querySelector('#ppOverlay');
+    if(overlay) overlay.setAttribute('hidden','');
+    pendingPlayer=null;
   }
 
   /* ── Render player chips on intro ── */
@@ -471,6 +543,10 @@ window.TDA_TOURNAMENT = {
     const grid   = document.querySelector('#drawGrid');
     const btn       = document.querySelector('#drawStep2Btn');
 
+    priorityPairs=[];
+    pendingPlayer=null;
+    const prBadge=document.querySelector('#priorityBadge');
+    if(prBadge) prBadge.classList.remove('show');
     groupRunId++;
     wrap.classList.remove('done');
     wrap.setAttribute('hidden','');
@@ -502,4 +578,15 @@ window.TDA_TOURNAMENT = {
   if(excelBtn) excelBtn.addEventListener('click', exportExcel);
   const previewBtn=document.querySelector('#drawPreviewBtn');
   if(previewBtn) previewBtn.addEventListener('click', renderSchedulePreview);
+
+  const priorityBtn=document.querySelector('#priorityBtn');
+  const ppOverlay=document.querySelector('#ppOverlay');
+  const ppClose=document.querySelector('#ppClose');
+  const ppClear=document.querySelector('#ppClear');
+  const ppConfirm=document.querySelector('#ppConfirm');
+  if(priorityBtn) priorityBtn.addEventListener('click', openPriorityModal);
+  if(ppClose) ppClose.addEventListener('click', closePriorityModal);
+  if(ppClear) ppClear.addEventListener('click',()=>{priorityPairs=[];pendingPlayer=null;renderPriorityModal();});
+  if(ppConfirm) ppConfirm.addEventListener('click', closePriorityModal);
+  if(ppOverlay) ppOverlay.addEventListener('click',e=>{if(e.target===ppOverlay)closePriorityModal();});
 })();

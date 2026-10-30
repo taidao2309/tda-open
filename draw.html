@@ -22,6 +22,45 @@
     .draw-group-list{contain:layout style}
     .draw-slot,.draw-slot-name,.draw-slot-rank,.draw-group-idx,.draw-group-player-name,.draw-group-player-rank{will-change:contents}
     @media(max-width:560px){.draw-screen{padding-top:58px}.draw-intro{min-height:calc(100vh - 58px)}}
+    /* ── Priority Modal ── */
+    .pp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:900;display:flex;align-items:center;justify-content:center;padding:16px}
+    .pp-overlay[hidden]{display:none}
+    .pp-modal{background:#060f08;border:1px solid rgba(200,245,54,.2);border-radius:18px;width:100%;max-width:660px;max-height:88vh;display:flex;flex-direction:column;overflow:hidden}
+    .pp-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid rgba(255,255,255,.06)}
+    .pp-head h2{font:900 15px var(--barlow);letter-spacing:3px;text-transform:uppercase;color:#c8f536;margin:0}
+    .pp-close{background:none;border:none;color:rgba(255,255,255,.45);font-size:18px;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;line-height:1}
+    .pp-close:hover{color:#fff;background:rgba(255,255,255,.08)}
+    .pp-body{padding:18px 22px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:16px}
+    .pp-hint{padding:9px 13px;border-radius:9px;font:700 11px var(--barlow);letter-spacing:1.5px;text-transform:uppercase}
+    .pp-hint.idle{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.35)}
+    .pp-hint.picking{background:rgba(200,245,54,.1);border:1px solid rgba(200,245,54,.3);color:#c8f536}
+    .pp-grid{display:flex;flex-wrap:wrap;gap:7px}
+    .pp-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:9px;cursor:pointer;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.04);transition:border-color .15s,background .15s,opacity .15s;user-select:none;color:rgba(255,255,255,.82)}
+    .pp-chip:hover:not(.used){border-color:rgba(200,245,54,.45);background:rgba(200,245,54,.09);color:#c8f536}
+    .pp-chip.pending{border-color:#c8f536;background:rgba(200,245,54,.16);color:#c8f536;box-shadow:0 0 0 2px rgba(200,245,54,.2)}
+    .pp-chip.used{opacity:.22;cursor:default;pointer-events:none}
+    .pp-chip-rank{font:800 10px var(--barlow);letter-spacing:.5px;padding:2px 6px;border-radius:5px;background:rgba(255,255,255,.1)}
+    .pp-chip-name{font:500 13px var(--sans);white-space:nowrap}
+    .pp-pairs-label{font:800 11px var(--barlow);letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3)}
+    .pp-pairs-list{display:flex;flex-direction:column;gap:7px}
+    .pp-pair{display:flex;align-items:center;gap:10px;padding:9px 13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px}
+    .pp-pair-names{flex:1;font:500 13px var(--sans);color:rgba(255,255,255,.8)}
+    .pp-pair-vs{font:700 10px var(--barlow);letter-spacing:1px;color:rgba(255,255,255,.28);margin:0 5px}
+    .pp-pair-del{background:none;border:none;color:rgba(255,255,255,.28);cursor:pointer;padding:3px 7px;font-size:14px;border-radius:6px;flex-shrink:0;line-height:1}
+    .pp-pair-del:hover{color:#ff7070;background:rgba(255,80,80,.12)}
+    .pp-foot{padding:14px 22px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;gap:10px}
+    .pp-foot-count{font:600 12px var(--sans);color:rgba(255,255,255,.4)}
+    .pp-foot-btns{display:flex;gap:8px}
+    .pp-clear{background:none;border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.45);font:600 12px var(--sans);padding:8px 14px;border-radius:9px;cursor:pointer}
+    .pp-clear:hover{border-color:rgba(255,255,255,.25);color:#fff}
+    .pp-confirm{background:#c8f536;border:none;color:#020c06;font:700 13px var(--sans);padding:8px 18px;border-radius:9px;cursor:pointer}
+    .pp-confirm:hover{background:#d9f84d}
+    /* Priority button on intro */
+    .draw-priority-btn{display:inline-flex;align-items:center;gap:10px;background:rgba(200,245,54,.06);border:1.5px solid rgba(200,245,54,.35);color:rgba(200,245,54,.85);font:700 13px var(--sans);letter-spacing:.4px;padding:0 28px;height:70px;border-radius:999px;cursor:pointer;margin-bottom:20px;transition:background .2s,border-color .2s,box-shadow .2s,color .2s;box-sizing:border-box}
+    .draw-priority-btn:hover{background:rgba(200,245,54,.13);border-color:#c8f536;color:#c8f536;box-shadow:0 0 0 4px rgba(200,245,54,.1)}
+    .draw-priority-btn .pp-icon{font-size:15px;line-height:1}
+    .draw-priority-badge{display:none;background:#c8f536;color:#020c06;font:800 10px var(--sans);padding:2px 8px;border-radius:20px;letter-spacing:.3px}
+    .draw-priority-badge.show{display:inline}
   </style>
 </head>
 <body>
@@ -81,6 +120,12 @@
 
         <!-- Player chips -->
         <div class="draw-chips" id="drawChips"></div>
+
+        <button class="draw-priority-btn" id="priorityBtn">
+          <span class="pp-icon">⚡</span>
+          Cặp ưu tiên
+          <span class="draw-priority-badge" id="priorityBadge"></span>
+        </button>
 
         <button class="draw-cta" id="drawStartBtn">
           <span class="draw-cta-label">Bắt đầu bốc thăm</span>
@@ -163,7 +208,30 @@
 
   </main>
 
+  <!-- Priority pairs modal -->
+  <div class="pp-overlay" id="ppOverlay" hidden>
+    <div class="pp-modal">
+      <div class="pp-head">
+        <h2>CẶP ƯU TIÊN</h2>
+        <button class="pp-close" id="ppClose" aria-label="Đóng">✕</button>
+      </div>
+      <div class="pp-body">
+        <div class="pp-hint idle" id="ppHint">Chọn cơ thủ thứ nhất...</div>
+        <div class="pp-grid" id="ppGrid"></div>
+        <div class="pp-pairs-label">ĐÃ GHÉP (<span id="ppCount">0</span>)</div>
+        <div class="pp-pairs-list" id="ppList"></div>
+      </div>
+      <div class="pp-foot">
+        <span class="pp-foot-count" id="ppFootCount">0 cặp ưu tiên</span>
+        <div class="pp-foot-btns">
+          <button class="pp-clear" id="ppClear">Xóa tất cả</button>
+          <button class="pp-confirm" id="ppConfirm">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="tournament-data.js?v=3"></script>
-  <script src="draw.js?v=19"></script>
+  <script src="draw.js?v=20"></script>
 </body>
 </html>
