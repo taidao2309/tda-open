@@ -317,16 +317,21 @@
           scoreHome:null,scoreAway:null});
       });
     }
+    // Pack into sessions of ≤4, no team conflict. Sort larger group first so it anchors tables 1-2.
+    const largerGroup=currentGroups.A.length>=currentGroups.B.length?'A':'B';
     const sessions=[];
     fixtures.forEach(match=>{
       let sessionIndex=sessions.findIndex(session=>session.length<4&&
-        !session.some(game=>[game.home,game.away].some(team=>team===match.home||team===match.away)));
-      if(sessionIndex<0){sessionIndex=sessions.length;sessions.push([])}
+        !session.some(g=>g.home===match.home||g.home===match.away||g.away===match.home||g.away===match.away));
+      if(sessionIndex<0){sessionIndex=sessions.length;sessions.push([]);}
       sessions[sessionIndex].push(match);
     });
-    return sessions.flatMap((session,roundIndex)=>session.map((match,tableIndex)=>(
-      {...match,round:roundIndex+1,table:tableIndex+1}
-    ))).map((match,index)=>({...match,no:index+1}));
+    let no=1;
+    return sessions.flatMap((session,roundIndex)=>{
+      // Sort: larger group first → gets tables 1,2 (and 3 on overflow), smaller group → tables 3,4
+      const sorted=[...session].sort((a,b)=>a.group===largerGroup?-1:b.group===largerGroup?1:0);
+      return sorted.map((m,i)=>({...m,round:roundIndex+1,table:i+1,no:no++}));
+    });
   }
 
   /* ── Export tournament-data.js ── */
