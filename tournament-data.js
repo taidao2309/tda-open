@@ -14,7 +14,7 @@ window.TDA_TOURNAMENT = {
     { id: 'P05', name: 'Trần Đình Lực', rank: 'B' },
     { id: 'P06', name: 'Nguyễn Thị Loan', rank: 'F' },
     { id: 'P07', name: 'Bùi Minh Sơn', rank: 'A' },
-    { id: 'P08', name: 'Trịnh Quốc Tuấn', rank: 'C' },
+    { id: 'P08', name: 'Trịnh Quốc Tuấn', rank: 'D' },
     { id: 'P09', name: 'Nguyễn Hữu Quang Linh', rank: 'C' },
     { id: 'P10', name: 'Đào Phương Nguyên', rank: 'F' },
     { id: 'P11', name: 'Nguyễn Văn Hải', rank: 'C' },
@@ -27,7 +27,7 @@ window.TDA_TOURNAMENT = {
     { id: 'P18', name: 'Hoàng Thị Dư', rank: 'F' },
     { id: 'P19', name: 'Nguyễn Duy Hải', rank: 'C' },
     { id: 'P20', name: 'Đàm Tiến Nam', rank: 'D' },
-    { id: 'P21', name: 'Đàm Sơn Đông', rank: 'A' },
+    { id: 'P21', name: 'Đàm Sơn Đông', rank: 'B' },
     { id: 'P22', name: 'Lê Thiên Trang', rank: 'D' },
   ],
 
