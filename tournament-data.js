@@ -227,9 +227,9 @@ window.TDA_TOURNAMENT = {
     matches: {
         group: [
             {
-                "group": "B",
-                "home": "T02",
-                "away": "T04",
+                "group": "A",
+                "home": "T01",
+                "away": "T07",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 1,
@@ -237,9 +237,9 @@ window.TDA_TOURNAMENT = {
                 "no": 1
             },
             {
-                "group": "B",
-                "home": "T11",
-                "away": "T06",
+                "group": "A",
+                "home": "T03",
+                "away": "T05",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 1,
@@ -248,8 +248,8 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "B",
-                "home": "T08",
-                "away": "T09",
+                "home": "T02",
+                "away": "T04",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 1,
@@ -257,9 +257,9 @@ window.TDA_TOURNAMENT = {
                 "no": 3
             },
             {
-                "group": "A",
-                "home": "T01",
-                "away": "T07",
+                "group": "B",
+                "home": "T08",
+                "away": "T09",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 1,
@@ -267,9 +267,9 @@ window.TDA_TOURNAMENT = {
                 "no": 4
             },
             {
-                "group": "B",
-                "home": "T11",
-                "away": "T02",
+                "group": "A",
+                "home": "T01",
+                "away": "T03",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 2,
@@ -277,9 +277,9 @@ window.TDA_TOURNAMENT = {
                 "no": 5
             },
             {
-                "group": "B",
-                "home": "T09",
-                "away": "T04",
+                "group": "A",
+                "home": "T10",
+                "away": "T05",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 2,
@@ -288,8 +288,8 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "B",
-                "home": "T08",
-                "away": "T06",
+                "home": "T11",
+                "away": "T02",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 2,
@@ -297,9 +297,9 @@ window.TDA_TOURNAMENT = {
                 "no": 7
             },
             {
-                "group": "A",
-                "home": "T03",
-                "away": "T05",
+                "group": "B",
+                "home": "T08",
+                "away": "T04",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 2,
@@ -307,24 +307,14 @@ window.TDA_TOURNAMENT = {
                 "no": 8
             },
             {
-                "group": "B",
-                "home": "T06",
-                "away": "T02",
+                "group": "A",
+                "home": "T05",
+                "away": "T01",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 3,
                 "table": 1,
                 "no": 9
-            },
-            {
-                "group": "B",
-                "home": "T08",
-                "away": "T04",
-                "scoreHome": null,
-                "scoreAway": null,
-                "round": 3,
-                "table": 2,
-                "no": 10
             },
             {
                 "group": "A",
@@ -333,18 +323,8 @@ window.TDA_TOURNAMENT = {
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 3,
-                "table": 3,
-                "no": 11
-            },
-            {
-                "group": "A",
-                "home": "T01",
-                "away": "T03",
-                "scoreHome": null,
-                "scoreAway": null,
-                "round": 3,
-                "table": 4,
-                "no": 12
+                "table": 2,
+                "no": 10
             },
             {
                 "group": "B",
@@ -352,29 +332,29 @@ window.TDA_TOURNAMENT = {
                 "away": "T02",
                 "scoreHome": null,
                 "scoreAway": null,
-                "round": 4,
-                "table": 1,
-                "no": 13
+                "round": 3,
+                "table": 3,
+                "no": 11
             },
             {
                 "group": "B",
-                "home": "T09",
-                "away": "T11",
+                "home": "T06",
+                "away": "T09",
                 "scoreHome": null,
                 "scoreAway": null,
-                "round": 4,
-                "table": 2,
-                "no": 14
+                "round": 3,
+                "table": 4,
+                "no": 12
             },
             {
                 "group": "A",
                 "home": "T10",
-                "away": "T05",
+                "away": "T01",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 4,
-                "table": 3,
-                "no": 15
+                "table": 1,
+                "no": 13
             },
             {
                 "group": "A",
@@ -383,13 +363,33 @@ window.TDA_TOURNAMENT = {
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 4,
+                "table": 2,
+                "no": 14
+            },
+            {
+                "group": "B",
+                "home": "T09",
+                "away": "T11",
+                "scoreHome": null,
+                "scoreAway": null,
+                "round": 4,
+                "table": 3,
+                "no": 15
+            },
+            {
+                "group": "B",
+                "home": "T04",
+                "away": "T06",
+                "scoreHome": null,
+                "scoreAway": null,
+                "round": 4,
                 "table": 4,
                 "no": 16
             },
             {
-                "group": "B",
-                "home": "T06",
-                "away": "T09",
+                "group": "A",
+                "home": "T10",
+                "away": "T03",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 5,
@@ -407,9 +407,9 @@ window.TDA_TOURNAMENT = {
                 "no": 18
             },
             {
-                "group": "A",
-                "home": "T10",
-                "away": "T03",
+                "group": "B",
+                "home": "T02",
+                "away": "T09",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 5,
@@ -417,9 +417,9 @@ window.TDA_TOURNAMENT = {
                 "no": 19
             },
             {
-                "group": "A",
-                "home": "T05",
-                "away": "T01",
+                "group": "B",
+                "home": "T08",
+                "away": "T06",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 5,
@@ -427,9 +427,9 @@ window.TDA_TOURNAMENT = {
                 "no": 20
             },
             {
-                "group": "B",
-                "home": "T04",
-                "away": "T06",
+                "group": "A",
+                "home": "T05",
+                "away": "T07",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 6,
@@ -438,8 +438,8 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "B",
-                "home": "T02",
-                "away": "T09",
+                "home": "T08",
+                "away": "T11",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 6,
@@ -448,8 +448,8 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "B",
-                "home": "T08",
-                "away": "T11",
+                "home": "T06",
+                "away": "T02",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 6,
@@ -457,9 +457,9 @@ window.TDA_TOURNAMENT = {
                 "no": 23
             },
             {
-                "group": "A",
-                "home": "T10",
-                "away": "T01",
+                "group": "B",
+                "home": "T09",
+                "away": "T04",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 6,
@@ -467,9 +467,9 @@ window.TDA_TOURNAMENT = {
                 "no": 24
             },
             {
-                "group": "A",
-                "home": "T05",
-                "away": "T07",
+                "group": "B",
+                "home": "T11",
+                "away": "T06",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 7,
