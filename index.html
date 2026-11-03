@@ -95,7 +95,7 @@
       <div class="group-switch" id="groupSwitch"><button class="active" data-group="A">Bảng A</button><button data-group="B">Bảng B</button></div>
       <div class="team-layout">
         <div class="team-list" id="teamList"></div>
-        <aside class="standings"><div class="standing-title"><span>Bảng xếp hạng</span><b id="standingGroup">A</b></div><div class="standing-head"><span>Đội</span><span>Tr</span><span>T</span><span>B</span><span>Điểm</span></div><div id="standingRows"></div></aside>
+        <aside class="standings"><div class="standing-title"><span>Bảng xếp hạng</span><b id="standingGroup">A</b></div><div class="standing-head"><span>Đội</span><span>Tr</span><span>T</span><span>H</span><span>B</span><span>Điểm</span></div><div id="standingRows"></div></aside>
       </div>
     </section>
 
@@ -119,6 +119,8 @@
   </main>
 
   <footer><a class="brand" href="#top"><img class="brand-icon" src="assets/billiards-mark.svg" alt=""><span>TDA <b>OPEN</b></span></a><p>© 2026 TDA Open. All rights reserved.</p><div><a href="#players">Danh sách</a><a href="#schedule">Lịch đấu</a><a href="#bracket">Vòng chung kết</a></div></footer>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
   <script src="tournament-data.js?v=2"></script>
   <script src="app.js?v=5"></script>
 </body>

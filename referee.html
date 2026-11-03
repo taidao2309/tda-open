@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Trọng tài — TDA Open 2026</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07110d;
+      --bg2: #0d1c14;
+      --bg3: #111f18;
+      --border: rgba(168,255,62,.12);
+      --border-strong: rgba(168,255,62,.28);
+      --accent: #a8ff3e;
+      --accent-dim: rgba(168,255,62,.16);
+      --text: #e8f0e9;
+      --text-dim: rgba(232,240,233,.55);
+      --red: #ff5c5c;
+      --radius: 10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      min-height: 100dvh;
+      line-height: 1.5;
+    }
+
+    /* ── LOGIN ── */
+    #loginScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      padding: 2rem 1.25rem;
+      gap: 1.5rem;
+    }
+
+    .login-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2rem, 8vw, 3rem);
+      letter-spacing: .06em;
+      text-align: center;
+      line-height: 1.05;
+    }
+    .login-logo em {
+      display: block;
+      color: var(--accent);
+      font-style: normal;
+      font-size: .72em;
+      letter-spacing: .14em;
+    }
+
+    .login-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.5rem;
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .login-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .pw-input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Manrope', sans-serif;
+      font-size: 1rem;
+      padding: .75rem 1rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .pw-input:focus { border-color: var(--accent); }
+
+    .login-btn {
+      background: var(--accent);
+      color: #07110d;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: .08em;
+      padding: .85rem 1.5rem;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .login-btn:hover { opacity: .88; }
+    .login-btn:active { opacity: .72; }
+
+    .login-error {
+      color: var(--red);
+      font-size: .85rem;
+      font-weight: 600;
+      min-height: 1.2em;
+    }
+
+    /* ── ADMIN LAYOUT ── */
+    #adminScreen { display: none; }
+
+    .admin-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: .75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+    }
+
+    .admin-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: .07em;
+      white-space: nowrap;
+    }
+    .admin-title em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+      padding: .3rem .7rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .sync-status::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--text-dim);
+      flex-shrink: 0;
+    }
+    .sync-status.ok { border-color: var(--border-strong); }
+    .sync-status.ok::before { background: var(--accent); }
+    .sync-status.error::before { background: var(--red); }
+    .sync-status.connecting::before { background: #ffd166; }
+
+    /* ── MATCH ADMIN ── */
+    #matchAdmin {
+      padding: .75rem 1rem 5rem;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    .phase-section { margin-bottom: 2rem; }
+
+    .phase-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 1.3rem;
+      letter-spacing: .12em;
+      color: var(--accent);
+      padding: 1rem 0 .5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: .75rem;
+      position: sticky;
+      top: 57px;
+      background: var(--bg);
+      z-index: 90;
+    }
+
+    .round-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: .5rem 0 .25rem;
+      margin-top: .5rem;
+    }
+
+    /* ── MATCH CARD ── */
+    .match-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .875rem 1rem;
+      margin-bottom: .625rem;
+      transition: border-color .2s;
+    }
+    .match-card:has(.score-input.has-value) {
+      border-color: var(--border-strong);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      margin-bottom: .5rem;
+    }
+
+    .match-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: .9rem;
+      letter-spacing: .08em;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .card-meta {
+      font-size: .72rem;
+      font-weight: 600;
+      color: var(--text-dim);
+      letter-spacing: .04em;
+      flex: 1;
+      text-align: right;
+    }
+
+    .saved-icon {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
+      width: 1rem;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .card-teams {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: .04em;
+      margin-bottom: .75rem;
+      color: var(--text);
+    }
+    .vs-sep {
+      color: var(--text-dim);
+      font-weight: 600;
+      margin: 0 .4rem;
+      font-size: .85em;
+    }
+
+    .card-score {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .score-input {
+      flex: 1;
+      min-width: 0;
+      background: var(--bg3);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      text-align: center;
+      padding: .6rem .25rem;
+      outline: none;
+      min-height: 3rem;
+      -moz-appearance: textfield;
+      -webkit-appearance: none;
+      appearance: textfield;
+      transition: border-color .2s, color .2s;
+      touch-action: manipulation;
+    }
+    .score-input::-webkit-outer-spin-button,
+    .score-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .score-input::placeholder { color: rgba(232,240,233,.25); font-size: 1.1rem; }
+    .score-input:focus { border-color: var(--accent); color: var(--text); }
+    .score-input.has-value { color: var(--text); border-color: var(--border-strong); }
+
+    .score-dash {
+      color: var(--text-dim);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .save-btn {
+      background: var(--bg3);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 800;
+      font-size: .9rem;
+      letter-spacing: .07em;
+      padding: .6rem 1.1rem;
+      cursor: pointer;
+      min-height: 3rem;
+      flex-shrink: 0;
+      transition: background .15s, border-color .15s, color .15s;
+      touch-action: manipulation;
+    }
+    .save-btn:hover:not(:disabled) {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #07110d;
+    }
+    .save-btn:active:not(:disabled) { opacity: .8; }
+    .save-btn:disabled { opacity: .5; cursor: default; }
+
+    @media (min-width: 520px) {
+      .score-input { font-size: 1.8rem; }
+      .save-btn { font-size: 1rem; padding: .6rem 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen">
+    <div class="login-logo">
+      TDA OPEN<em>2026</em>
+    </div>
+    <div class="login-box">
+      <label class="login-label" for="passwordInput">Mật khẩu trọng tài</label>
+      <input id="passwordInput" class="pw-input" type="password" placeholder="Nhập mật khẩu..." autocomplete="current-password">
+      <div id="loginError" class="login-error" aria-live="polite"></div>
+      <button id="loginBtn" class="login-btn">ĐĂNG NHẬP</button>
+    </div>
+  </div>
+
+  <!-- ADMIN SCREEN -->
+  <div id="adminScreen">
+    <header class="admin-header">
+      <div class="admin-title">TDA OPEN <em>2026</em> — TRỌNG TÀI</div>
+      <div id="syncStatus" class="sync-status connecting">
+        <span id="syncText">Đang kết nối...</span>
+      </div>
+    </header>
+    <div id="matchAdmin"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="tournament-data.js?v=2"></script>
+  <script src="referee.js"></script>
+</body>
+</html>
