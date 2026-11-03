@@ -10,7 +10,18 @@ const { createClient } = supabase;
 let sb;
 const t = window.TDA_TOURNAMENT;
 const teams = t.teams;
+const players = t.players;
 const allMatches = t.matches;
+
+function teamPlayersHtml(teamId) {
+  const team = teams.find(t => t.id === teamId);
+  if (!team) return '';
+  return team.playerIds
+    .map(pid => players.find(p => p.id === pid)?.name || '')
+    .filter(Boolean)
+    .map(escHtml)
+    .join('<br>');
+}
 
 // --- Login ---
 const loginScreen = document.getElementById('loginScreen');
@@ -111,7 +122,8 @@ function renderAdmin(scoreMap) {
         'group', m,
         teamName(m.home), teamName(m.away),
         `V${m.round} · Bảng ${m.group} · Bàn ${String(m.table).padStart(2, '0')}`,
-        scoreMap[`group_${m.no}`]
+        scoreMap[`group_${m.no}`],
+        m.home, m.away
       );
     });
   });
@@ -145,23 +157,20 @@ function renderAdmin(scoreMap) {
 
   container.innerHTML = html;
 
-  // Save button per card
-  container.querySelectorAll('.save-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const card = btn.closest('.match-card');
+  container.querySelectorAll('.match-card').forEach(card => {
+    card.querySelector('.save-btn').addEventListener('click', () => {
       saveScore(card, card.dataset.phase, parseInt(card.dataset.no, 10));
     });
-  });
 
-  // Track has-value class on input
-  container.querySelectorAll('.score-input').forEach(inp => {
-    inp.addEventListener('input', () => {
-      inp.classList.toggle('has-value', inp.value !== '');
+    card.querySelectorAll('.score-input').forEach(inp => {
+      inp.addEventListener('input', () => {
+        inp.classList.toggle('has-value', inp.value !== '');
+      });
     });
   });
 }
 
-function matchCard(phase, m, homeName, awayName, meta, score) {
+function matchCard(phase, m, homeName, awayName, meta, score, homeId, awayId) {
   const key = `${phase}_${m.no}`;
   const isSaved = score && score.score_home !== null && score.score_away !== null;
   const homeVal = isSaved ? score.score_home : '';
@@ -170,25 +179,32 @@ function matchCard(phase, m, homeName, awayName, meta, score) {
     ? `TRẬN ${String(m.no).padStart(2, '0')}`
     : phase === 'semifinal' ? `BÁN KẾT ${m.no}` : 'CHUNG KẾT';
 
-  // Escape team names to prevent XSS from data file names
   const escHome = escHtml(homeName);
   const escAway = escHtml(awayName);
   const escMeta = escHtml(meta);
   const escLabel = escHtml(label);
+  const homePlayers = homeId ? teamPlayersHtml(homeId) : '';
+  const awayPlayers = awayId ? teamPlayersHtml(awayId) : '';
 
   return `<div class="match-card${isSaved ? ' is-saved' : ''}" data-key="${key}" data-phase="${phase}" data-no="${m.no}">
   <div class="card-header">
     <span class="match-label">${escLabel}</span>
     <span class="card-meta">${escMeta}</span>
-    <span class="saved-icon">${isSaved ? '✓' : ''}</span>
+    <button class="save-btn">LƯU</button>
   </div>
-  <div class="card-score-row">
-    <span class="team-name">${escHome}</span>
+  <div class="teams-row">
+    <div class="team-col">
+      <span class="team-name">${escHome}</span>${homePlayers ? `<span class="team-players">${homePlayers}</span>` : ''}
+    </div>
+    <span class="vs-sep">vs</span>
+    <div class="team-col away">
+      <span class="team-name">${escAway}</span>${awayPlayers ? `<span class="team-players">${awayPlayers}</span>` : ''}
+    </div>
+  </div>
+  <div class="score-row">
     <input type="number" class="score-input${homeVal !== '' ? ' has-value' : ''}" data-side="home" value="${homeVal}" min="0" max="9" placeholder="—" inputmode="numeric">
     <span class="score-dash">—</span>
     <input type="number" class="score-input${awayVal !== '' ? ' has-value' : ''}" data-side="away" value="${awayVal}" min="0" max="9" placeholder="—" inputmode="numeric">
-    <span class="team-name away">${escAway}</span>
-    <button class="save-btn">Lưu</button>
   </div>
 </div>`;
 }
@@ -206,27 +222,32 @@ async function saveScore(card, phase, matchNo) {
   const btn = card.querySelector('.save-btn');
   const homeVal = card.querySelector('[data-side="home"]').value;
   const awayVal = card.querySelector('[data-side="away"]').value;
-  const scoreHome = homeVal !== '' ? parseInt(homeVal, 10) : null;
-  const scoreAway = awayVal !== '' ? parseInt(awayVal, 10) : null;
+
+  const row = {
+    phase,
+    match_no: matchNo,
+    score_home: homeVal !== '' ? parseInt(homeVal, 10) : null,
+    score_away: awayVal !== '' ? parseInt(awayVal, 10) : null,
+  };
 
   btn.disabled = true;
   btn.textContent = '...';
 
-  const { error } = await sb.from('match_scores').upsert(
-    { phase, match_no: matchNo, score_home: scoreHome, score_away: scoreAway, updated_at: new Date().toISOString() },
-    { onConflict: 'phase,match_no' }
-  );
-
-  btn.disabled = false;
-  if (error) {
-    btn.textContent = '✗';
-    setTimeout(() => { btn.textContent = 'Lưu'; }, 2000);
-  } else {
+  try {
+    const { error } = await sb.from('match_scores').upsert(row, { onConflict: 'phase,match_no' });
+    if (error) throw error;
     btn.textContent = '✓';
-    setTimeout(() => { btn.textContent = 'Lưu'; }, 1500);
-    markSaved(card, scoreHome !== null && scoreAway !== null);
+    setTimeout(() => { btn.textContent = 'LƯU'; }, 1500);
+    markSaved(card, row.score_home !== null && row.score_away !== null);
+  } catch (e) {
+    console.error('saveScore error:', e.message || e);
+    btn.textContent = '✗';
+    setTimeout(() => { btn.textContent = 'LƯU'; }, 2500);
+  } finally {
+    btn.disabled = false;
   }
 }
+
 
 // --- Save all ---
 async function saveAll() {
@@ -236,37 +257,35 @@ async function saveAll() {
   document.querySelectorAll('.match-card').forEach(card => {
     const homeVal = card.querySelector('[data-side="home"]').value;
     const awayVal = card.querySelector('[data-side="away"]').value;
-    if (homeVal === '' && awayVal === '') return;
     rows.push({
       phase: card.dataset.phase,
       match_no: parseInt(card.dataset.no, 10),
       score_home: homeVal !== '' ? parseInt(homeVal, 10) : null,
       score_away: awayVal !== '' ? parseInt(awayVal, 10) : null,
-      updated_at: new Date().toISOString(),
     });
   });
-
-  if (rows.length === 0) return;
 
   btn.disabled = true;
   btn.textContent = 'ĐANG LƯU...';
 
-  const { error } = await sb.from('match_scores').upsert(rows, { onConflict: 'phase,match_no' });
-
-  btn.disabled = false;
-  if (error) {
-    btn.textContent = '✗ LỖI — THỬ LẠI';
-    setTimeout(() => { btn.textContent = 'LƯU TẤT CẢ'; }, 3000);
-  } else {
-    btn.textContent = `✓ ĐÃ LƯU ${rows.length} TRẬN`;
-    setTimeout(() => { btn.textContent = 'LƯU TẤT CẢ'; }, 2500);
+  try {
+    const { error } = await sb.from('match_scores').upsert(rows, { onConflict: 'phase,match_no' });
+    if (error) throw error;
     rows.forEach(r => {
       const card = document.querySelector(`[data-phase="${r.phase}"][data-no="${r.match_no}"]`);
       if (card) markSaved(card, r.score_home !== null && r.score_away !== null);
     });
+    btn.textContent = `✓ ĐÃ LƯU ${rows.length} TRẬN`;
+    setTimeout(() => { btn.textContent = 'LƯU TẤT CẢ'; }, 2500);
+  } catch (e) {
+    console.error('saveAll error:', e.message || e);
+    btn.textContent = '✗ LỖI — THỬ LẠI';
+    setTimeout(() => { btn.textContent = 'LƯU TẤT CẢ'; }, 3000);
+  } finally {
+    btn.disabled = false;
   }
 }
 
 function markSaved(card, saved) {
-  card.querySelector('.saved-icon').textContent = saved ? '✓' : '';
+  card.classList.toggle('is-saved', saved);
 }
