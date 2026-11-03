@@ -1,6 +1,11 @@
 // referee.js — Referee admin page logic
 // Depends on: supabase (CDN global), window.TDA_TOURNAMENT, window.SUPABASE_URL, window.SUPABASE_ANON_KEY, window.REFEREE_PASSWORD
 
+// Dismiss keyboard when tapping outside any input
+document.addEventListener('touchstart', e => {
+  if (!e.target.matches('input, button')) document.activeElement?.blur();
+}, { passive: true });
+
 const { createClient } = supabase;
 let sb;
 const t = window.TDA_TOURNAMENT;
@@ -18,6 +23,7 @@ pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); })
 
 function tryLogin() {
   if (pwInput.value === window.REFEREE_PASSWORD) {
+    localStorage.setItem('ref_auth', '1');
     loginScreen.style.display = 'none';
     adminScreen.style.display = 'block';
     initAdmin();
@@ -25,6 +31,13 @@ function tryLogin() {
     loginErr.textContent = 'Mật khẩu không đúng';
     pwInput.select();
   }
+}
+
+// Auto-login nếu đã xác thực trước đó
+if (localStorage.getItem('ref_auth') === '1') {
+  loginScreen.style.display = 'none';
+  adminScreen.style.display = 'block';
+  initAdmin();
 }
 
 // --- Admin init ---
@@ -41,6 +54,7 @@ async function initAdmin() {
   const scoreMap = buildScoreMap(scores);
   renderAdmin(scoreMap);
   setSync('ok', 'Đã kết nối');
+  document.getElementById('saveAllBtn').addEventListener('click', saveAll);
 
   sb.channel('referee_sync')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'match_scores' }, payload => {
@@ -131,15 +145,11 @@ function renderAdmin(scoreMap) {
 
   container.innerHTML = html;
 
-  // Attach save button listeners
+  // Save button per card
   container.querySelectorAll('.save-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const card = btn.closest('.match-card');
-      const phase = card.dataset.phase;
-      const no = parseInt(card.dataset.no, 10);
-      const homeVal = card.querySelector('[data-side="home"]').value;
-      const awayVal = card.querySelector('[data-side="away"]').value;
-      saveScore(card, phase, no, homeVal, awayVal);
+      saveScore(card, card.dataset.phase, parseInt(card.dataset.no, 10));
     });
   });
 
@@ -166,17 +176,18 @@ function matchCard(phase, m, homeName, awayName, meta, score) {
   const escMeta = escHtml(meta);
   const escLabel = escHtml(label);
 
-  return `<div class="match-card" data-key="${key}" data-phase="${phase}" data-no="${m.no}">
+  return `<div class="match-card${isSaved ? ' is-saved' : ''}" data-key="${key}" data-phase="${phase}" data-no="${m.no}">
   <div class="card-header">
     <span class="match-label">${escLabel}</span>
     <span class="card-meta">${escMeta}</span>
     <span class="saved-icon">${isSaved ? '✓' : ''}</span>
   </div>
-  <div class="card-teams">${escHome} <span class="vs-sep">vs</span> ${escAway}</div>
-  <div class="card-score">
-    <input type="number" class="score-input${homeVal !== '' ? ' has-value' : ''}" data-side="home" value="${homeVal}" min="0" max="99" placeholder="—">
+  <div class="card-score-row">
+    <span class="team-name">${escHome}</span>
+    <input type="number" class="score-input${homeVal !== '' ? ' has-value' : ''}" data-side="home" value="${homeVal}" min="0" max="9" placeholder="—" inputmode="numeric">
     <span class="score-dash">—</span>
-    <input type="number" class="score-input${awayVal !== '' ? ' has-value' : ''}" data-side="away" value="${awayVal}" min="0" max="99" placeholder="—">
+    <input type="number" class="score-input${awayVal !== '' ? ' has-value' : ''}" data-side="away" value="${awayVal}" min="0" max="9" placeholder="—" inputmode="numeric">
+    <span class="team-name away">${escAway}</span>
     <button class="save-btn">Lưu</button>
   </div>
 </div>`;
@@ -190,9 +201,11 @@ function escHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-// --- Save ---
-async function saveScore(card, phase, matchNo, homeVal, awayVal) {
+// --- Save single ---
+async function saveScore(card, phase, matchNo) {
   const btn = card.querySelector('.save-btn');
+  const homeVal = card.querySelector('[data-side="home"]').value;
+  const awayVal = card.querySelector('[data-side="away"]').value;
   const scoreHome = homeVal !== '' ? parseInt(homeVal, 10) : null;
   const scoreAway = awayVal !== '' ? parseInt(awayVal, 10) : null;
 
@@ -200,23 +213,57 @@ async function saveScore(card, phase, matchNo, homeVal, awayVal) {
   btn.textContent = '...';
 
   const { error } = await sb.from('match_scores').upsert(
-    {
-      phase,
-      match_no: matchNo,
-      score_home: scoreHome,
-      score_away: scoreAway,
-      updated_at: new Date().toISOString(),
-    },
+    { phase, match_no: matchNo, score_home: scoreHome, score_away: scoreAway, updated_at: new Date().toISOString() },
     { onConflict: 'phase,match_no' }
   );
 
   btn.disabled = false;
   if (error) {
-    btn.textContent = '✗ Lỗi';
+    btn.textContent = '✗';
     setTimeout(() => { btn.textContent = 'Lưu'; }, 2000);
   } else {
-    btn.textContent = 'Lưu';
+    btn.textContent = '✓';
+    setTimeout(() => { btn.textContent = 'Lưu'; }, 1500);
     markSaved(card, scoreHome !== null && scoreAway !== null);
+  }
+}
+
+// --- Save all ---
+async function saveAll() {
+  const btn = document.getElementById('saveAllBtn');
+  const rows = [];
+
+  document.querySelectorAll('.match-card').forEach(card => {
+    const homeVal = card.querySelector('[data-side="home"]').value;
+    const awayVal = card.querySelector('[data-side="away"]').value;
+    if (homeVal === '' && awayVal === '') return;
+    rows.push({
+      phase: card.dataset.phase,
+      match_no: parseInt(card.dataset.no, 10),
+      score_home: homeVal !== '' ? parseInt(homeVal, 10) : null,
+      score_away: awayVal !== '' ? parseInt(awayVal, 10) : null,
+      updated_at: new Date().toISOString(),
+    });
+  });
+
+  if (rows.length === 0) return;
+
+  btn.disabled = true;
+  btn.textContent = 'ĐANG LƯU...';
+
+  const { error } = await sb.from('match_scores').upsert(rows, { onConflict: 'phase,match_no' });
+
+  btn.disabled = false;
+  if (error) {
+    btn.textContent = '✗ LỖI — THỬ LẠI';
+    setTimeout(() => { btn.textContent = 'LƯU TẤT CẢ'; }, 3000);
+  } else {
+    btn.textContent = `✓ ĐÃ LƯU ${rows.length} TRẬN`;
+    setTimeout(() => { btn.textContent = 'LƯU TẤT CẢ'; }, 2500);
+    rows.forEach(r => {
+      const card = document.querySelector(`[data-phase="${r.phase}"][data-no="${r.match_no}"]`);
+      if (card) markSaved(card, r.score_home !== null && r.score_away !== null);
+    });
   }
 }
 

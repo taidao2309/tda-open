@@ -481,3 +481,16 @@ footer>p{position:absolute;left:50%;top:50%;margin:0;transform:translate(-50%,-5
 .register .btn-label{position:static;transform:none;justify-self:center;text-align:center}
 .register .cta-arrow{position:static;width:42px;height:42px}
 
+
+/* Referee mode inline scoring */
+#refToggle{margin-left:auto;color:#5a6b62;border-bottom-color:transparent!important}
+#refToggle.active{color:var(--acid);font-weight:800}
+.ref-inputs{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(168,255,62,.4);border-radius:5px;padding:3px 8px;min-width:90px;justify-content:center}
+.ref-inp{width:30px;height:26px;text-align:center;background:transparent;border:none;color:var(--acid);font:700 15px var(--display);outline:none;-moz-appearance:textfield}
+.ref-inp::-webkit-outer-spin-button,.ref-inp::-webkit-inner-spin-button{-webkit-appearance:none}
+.ref-inp::placeholder{color:#3a4d42}
+.ref-sep{color:#5a6b62;font-size:12px}
+.match.ref-mode{background:rgba(168,255,62,.03)}
+.score-clickable{cursor:pointer;transition:border-color .15s}
+.score-clickable:hover{border-color:rgba(168,255,62,.5);color:var(--acid)}
+.score-clickable.editing{border-color:var(--acid);padding:0 6px;display:inline-flex;align-items:center;gap:4px}

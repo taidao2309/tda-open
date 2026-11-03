@@ -30,7 +30,7 @@ function renderGroup(group){
   const groupTeams=teams.filter(team=>team.group===group);
   teamList.innerHTML=groupTeams.map(team=>{
     const members=team.playerIds.map(playerById).filter(Boolean);
-     const ballNo=parseInt(team.id.slice(1),10);return `<article class="team-card"><div class="team-id"><div class="draw-ball" data-ball="${ballNo}"><span>${ballNo}</span></div><b>${team.name}</b></div><div class="team-members">${members.length?members.map(player=>`<p><span>${player.name}</span><i class="rank-${player.rank}">Rank ${player.rank}</i></p>`).join(''):'<p class="waiting">Chưa chia cơ thủ</p>'}</div></article>`;
+    const ballNo=parseInt(team.id.slice(1),10);return `<article class="team-card"><div class="team-id"><div class="draw-ball" data-ball="${ballNo}"><span>${ballNo}</span></div><b>${team.name}</b></div><div class="team-members">${members.length?members.map(player=>`<p><span>${player.name}</span><i class="rank-${player.rank}">Rank ${player.rank}</i></p>`).join(''):'<p class="waiting">Chưa chia cơ thủ</p>'}</div></article>`;
   }).join('');
   const stats=groupTeams.map(team=>({team,played:0,won:0,drawn:0,lost:0,points:0}));
   matches.group.filter(match=>match.group===group && Number.isFinite(match.scoreHome) && Number.isFinite(match.scoreAway)).forEach(match=>{
@@ -47,17 +47,19 @@ groupSwitch.addEventListener('click',event=>{if(event.target.matches('button'))r
 
 const tabs=document.querySelector('#dateTabs'), list=document.querySelector('#matchList');
 const phases={group:'Vòng bảng (25)',semifinal:'Bán kết (2)',final:'Chung kết'};
+function getActivePhase(){return document.querySelector('#dateTabs button.active')?.dataset.phase||'group';}
 function renderMatches(phase){
   tabs.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.phase===phase));
   list.innerHTML=matches[phase].map(m=>{
     const played=Number.isFinite(m.scoreHome)&&Number.isFinite(m.scoreAway);
     const score=played?`${m.scoreHome} — ${m.scoreAway}`:'—';
-    const meta=phase==='group'?`${m.round?`V\u00f2ng ${m.round} \u00b7 `:''}B\u1ea3ng ${m.group} \u00b7 B\u00e0n ${String(m.table).padStart(2,'0')}`:`B\u00e0n ${String(m.table).padStart(2,'0')}`;
+    const meta=phase==='group'?`Vòng ${m.round} · Bảng ${m.group} · Bàn ${String(m.table).padStart(2,'0')}`:`Bàn ${String(m.table).padStart(2,'0')}`;
     return `<article class="match"><span class="match-index"><small>Trận</small>${String(m.no).padStart(2,'0')}</span><span class="team">${teamLabel(m.home)}</span><span class="score ${played?'played':''}">${score}</span><span class="team away">${teamLabel(m.away)}</span><span class="table">${meta}</span></article>`;
   }).join('');
 }
 Object.keys(phases).forEach((phase,i)=>tabs.insertAdjacentHTML('beforeend',`<button data-phase="${phase}" class="${i?'':'active'}">${phases[phase]}</button>`));
-tabs.addEventListener('click',e=>{if(e.target.matches('button'))renderMatches(e.target.dataset.phase)}); renderMatches('group');
+tabs.addEventListener('click',e=>{if(e.target.matches('button'))renderMatches(e.target.dataset.phase)});
+renderMatches('group');
 
 const bracketBoard=document.querySelector('#bracketBoard');
 const bracketName=value=>teamLabel(value)||'?';
@@ -85,7 +87,6 @@ function onScroll(){
 }
 window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
 
-// One requestAnimationFrame loop owns every scroll-linked transform to avoid layout thrashing.
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const heroPhoto=document.querySelector('.hero-photo'), heroContent=document.querySelector('.hero-content');
 const orbitOne=document.querySelector('.orbit-one'), orbitTwo=document.querySelector('.orbit-two');
@@ -141,10 +142,10 @@ window.addEventListener('scroll',requestMotion,{passive:true});window.addEventLi
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.animate([{opacity:0,transform:'translate3d(0,26px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],{duration:720,delay:Math.min(+(entry.target.dataset.motionIndex||0)*45,270),easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});entry.target.classList.add('motion-in');observer.unobserve(entry.target)}}),{threshold:.08,rootMargin:'0px 0px -5%'});
 document.querySelectorAll('section:not(.hero):not(.ticker):not(.format) h2, .intro .section-no, .intro .kicker, .intro .lead, .stats article, .player-card,.team-card,.match,.duel,.bracket-board').forEach((el,index)=>{el.dataset.motionIndex=index%6;observer.observe(el)});
 
-// Supabase live scores — loads DB scores and subscribes to real-time updates
-(async function loadLiveScores() {
+// Supabase — load scores on init, realtime + 10s polling fallback
+(async function initSupabase() {
   if (!window.supabase || !window.SUPABASE_URL || window.SUPABASE_URL === 'YOUR_SUPABASE_URL') return;
-  const sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+  window._sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
 
   function applyScore({ phase, match_no, score_home, score_away }) {
     const match = matches[phase]?.find(m => m.no === match_no);
@@ -156,20 +157,22 @@ document.querySelectorAll('section:not(.hero):not(.ticker):not(.format) h2, .int
   function reRenderAll() {
     const g = document.querySelector('#groupSwitch button.active')?.dataset.group || 'A';
     renderGroup(g);
-    const ph = document.querySelector('#dateTabs button.active')?.dataset.phase || 'group';
-    renderMatches(ph);
+    renderMatches(getActivePhase());
     renderBracket();
   }
 
-  const { data: scores } = await sb.from('match_scores').select('*');
-  if (scores?.length) {
-    scores.forEach(applyScore);
-    reRenderAll();
+  async function fetchAll() {
+    const { data } = await window._sb.from('match_scores').select('*');
+    if (data?.length) { data.forEach(applyScore); reRenderAll(); }
   }
 
-  sb.channel('live_scores')
+  await fetchAll();
+
+  window._sb.channel('live_scores')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'match_scores' }, payload => {
       if (payload.new) { applyScore(payload.new); reRenderAll(); }
     })
     .subscribe();
+
+  setInterval(fetchAll, 10000);
 })();
