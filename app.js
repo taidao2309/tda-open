@@ -175,4 +175,5 @@ document.querySelectorAll('section:not(.hero):not(.ticker):not(.format) h2, .int
     .subscribe();
 
   setInterval(fetchAll, 10000);
+
 })();

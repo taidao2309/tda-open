@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07110d">
+  <title>Bình chọn — TDA Open 2026</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="vote-page">
+
+  <header class="vp-header">
+    <a href="/" class="vp-brand">
+      <img src="assets/tda-logo.png" alt="TDA Open 2026" height="34">
+    </a>
+    <span class="vp-title">CƠ THỦ ẤN TƯỢNG</span>
+  </header>
+
+  <main class="vp-main">
+
+    <!-- Loading -->
+    <div class="vp-step active" id="s-loading">
+      <div class="vp-card vp-center">
+        <div class="vp-spinner"></div>
+        <p>Đang kiểm tra...</p>
+      </div>
+    </div>
+
+    <!-- No session -->
+    <div class="vp-step" id="s-no-session">
+      <div class="vp-card vp-center">
+        <div class="vp-icon">⏳</div>
+        <h2>Chưa có phiên bình chọn</h2>
+        <p>Ban tổ chức chưa mở phiên. Vui lòng chờ.</p>
+      </div>
+    </div>
+
+    <!-- Session ended (no results) -->
+    <div class="vp-step" id="s-ended">
+      <div class="vp-card vp-center">
+        <div class="vp-icon">🏁</div>
+        <h2>Phiên đã kết thúc</h2>
+        <p>Cảm ơn các cơ thủ đã tham gia bình chọn!</p>
+      </div>
+    </div>
+
+    <!-- Step 1: Who are you? -->
+    <div class="vp-step" id="s-identity">
+      <div class="vp-card">
+        <h2>Bạn là ai?</h2>
+        <p class="vp-sub">Chọn tên của bạn để bắt đầu bình chọn</p>
+        <div class="vp-player-list" id="identityList"></div>
+      </div>
+    </div>
+
+    <!-- Already voted -->
+    <div class="vp-step" id="s-already">
+      <div class="vp-card vp-center">
+        <div class="vp-icon">✅</div>
+        <h2>Bạn đã bình chọn rồi</h2>
+        <p id="alreadyMsg"></p>
+      </div>
+    </div>
+
+    <!-- Step 2: Vote for someone -->
+    <div class="vp-step" id="s-vote">
+      <div class="vp-card">
+        <div class="vp-identity-bar" id="identityBar"></div>
+        <h2>Cơ thủ ấn tượng nhất</h2>
+        <p class="vp-sub">Chọn 1 người bạn ấn tượng nhất (trừ bản thân)</p>
+        <div class="vp-player-list" id="voteList"></div>
+      </div>
+    </div>
+
+    <!-- Confirm -->
+    <div class="vp-step" id="s-confirm">
+      <div class="vp-card vp-center">
+        <h2>Xác nhận bình chọn?</h2>
+        <div class="vp-confirm-name" id="confirmName"></div>
+        <div class="vp-confirm-actions">
+          <button class="vp-btn vp-btn-ghost" id="btnBack">Chọn lại</button>
+          <button class="vp-btn vp-btn-primary" id="btnConfirm">Xác nhận</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sending -->
+    <div class="vp-step" id="s-sending">
+      <div class="vp-card vp-center">
+        <div class="vp-spinner"></div>
+        <p>Đang ghi nhận...</p>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="vp-step" id="s-success">
+      <div class="vp-card vp-center">
+        <div class="vp-icon">🏆</div>
+        <h2>Cảm ơn bạn!</h2>
+        <p>Phiếu bình chọn đã được ghi nhận.</p>
+        <div class="vp-success-name" id="successName"></div>
+        <p class="vp-sub">Kết quả sẽ được ban tổ chức công bố sau.</p>
+      </div>
+    </div>
+
+    <!-- Results (after announcement) -->
+    <div class="vp-step" id="s-results">
+      <div class="vp-card">
+        <div class="vp-results-header">
+          <span class="vp-icon">🏆</span>
+          <h2>Kết quả bình chọn</h2>
+          <p class="vp-sub">Cơ thủ ấn tượng nhất TDA Open 2026</p>
+        </div>
+        <div id="resultsDisplay"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="tournament-data.js"></script>
+  <script src="vote.js"></script>
+</body>
+</html>
