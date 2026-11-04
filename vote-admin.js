@@ -164,11 +164,12 @@
       }
     });
 
-    document.getElementById('btnEnd')?.addEventListener('click', async () => {
-      if (!confirm('Kết thúc phiên bình chọn? Hành động không thể hoàn tác.')) return;
-      await sb.from('voting_sessions').update({ status: 'ended' }).eq('id', session.id);
-      resultsVisible = false;
-      render();
+    document.getElementById('btnEnd')?.addEventListener('click', () => {
+      askPassword(async () => {
+        await sb.from('voting_sessions').update({ status: 'ended' }).eq('id', session.id);
+        resultsVisible = false;
+        render();
+      });
     });
 
     document.getElementById('btnNew')?.addEventListener('click', async () => {
