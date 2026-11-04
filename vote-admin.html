@@ -14,7 +14,7 @@
   <style>
     html, body { background: #020c06; min-height: 100vh; overflow-x: clip; }
 
-    /* ── Topbar (matches draw.html) ── */
+    /* ── Topbar ── */
     .va-topbar {
       position: fixed; top: 0; left: 0; right: 0; height: 64px; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
@@ -31,12 +31,14 @@
     .va-back-btn:hover { color: #fff; border-color: rgba(255,255,255,.3); }
     .va-back-btn svg { width: 14px; height: 14px; }
 
-    /* ── Main layout ── */
+    /* ── Screen wrapper ── */
     .va-screen { padding-top: 64px; min-height: 100vh; }
 
-    /* ── State: loading ── */
-    .va-state { display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-height: calc(100vh - 64px); gap: 16px; }
+    /* ── Loading / empty states ── */
+    .va-state {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: calc(100vh - 64px); gap: 16px;
+    }
     .va-state p { color: rgba(255,255,255,.45); font: 500 15px var(--sans); }
     .va-spin {
       width: 36px; height: 36px; border: 3px solid rgba(200,245,54,.15);
@@ -44,12 +46,11 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── State: empty (create session) ── */
     .va-create-box {
       display: flex; flex-direction: column; align-items: center; gap: 20px;
       padding: 48px 32px; text-align: center;
     }
-    .va-create-icon { font-size: 48px; }
+    .va-create-icon { font-size: 52px; }
     .va-create-box h2 {
       font: 800 28px var(--barlow); letter-spacing: 2px; text-transform: uppercase;
       color: rgba(255,255,255,.85); margin: 0;
@@ -63,104 +64,142 @@
     }
     .va-create-btn:hover { background: #d9f84d; transform: translateY(-1px); }
 
-    /* ── Active session layout ── */
+    /* ── Active: centered kiosk layout ── */
     .va-active {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      gap: 0;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center;
+      padding: 40px 24px 56px; gap: 18px;
       min-height: calc(100vh - 64px);
     }
 
-    /* ── Left panel: QR + controls ── */
-    .va-left {
-      background: rgba(255,255,255,.025);
-      border-right: 1px solid rgba(255,255,255,.07);
-      padding: 32px 24px;
-      display: flex; flex-direction: column; gap: 24px;
+    .va-eyebrow {
+      font: 800 11px var(--barlow); letter-spacing: 4px; text-transform: uppercase;
+      color: rgba(255,255,255,.22); margin: 0;
     }
 
     .va-status-row {
       display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      justify-content: center;
     }
     .va-badge {
-      font: 800 11px var(--barlow); letter-spacing: 2px; text-transform: uppercase;
-      padding: 5px 12px; border-radius: 999px;
+      font: 800 12px var(--barlow); letter-spacing: 2px; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 999px;
     }
     .va-badge.va-open { background: rgba(200,245,54,.15); color: #c8f536; border: 1px solid rgba(200,245,54,.35); }
     .va-badge.va-ended { background: rgba(255,255,255,.07); color: rgba(255,255,255,.4); border: 1px solid rgba(255,255,255,.12); }
     .va-announced {
       font: 600 11px var(--sans); color: rgba(103,213,255,.8);
-      background: rgba(103,213,255,.1); padding: 4px 10px; border-radius: 999px;
+      background: rgba(103,213,255,.1); padding: 5px 12px; border-radius: 999px;
     }
     .va-vote-total {
-      font: 700 13px var(--barlow); color: rgba(255,255,255,.55); letter-spacing: 1px;
-      margin-left: auto;
+      font: 700 14px var(--barlow); color: rgba(255,255,255,.45); letter-spacing: 1px;
     }
 
     /* ── QR block ── */
     .va-qr-block {
-      background: #fff; border-radius: 16px; padding: 20px;
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
+      background: #fff; border-radius: 24px; padding: 28px 28px 18px;
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
+      box-shadow: 0 0 80px rgba(200,245,54,.1), 0 24px 64px rgba(0,0,0,.55);
+    }
+    .va-qr-label {
+      font: 800 10px var(--barlow); letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(0,0,0,.3);
     }
     #vaQR { line-height: 0; }
-    #vaQR canvas, #vaQR img { border-radius: 4px; display: block; }
+    #vaQR canvas, #vaQR img { border-radius: 6px; display: block; }
     .va-url {
-      font: 600 10px var(--sans); color: #333; word-break: break-all;
-      text-align: center; margin: 0;
+      font: 500 11px var(--sans); color: rgba(0,0,0,.45); word-break: break-all;
+      text-align: center; margin: 0; max-width: 280px;
     }
 
     /* ── Action buttons ── */
-    .va-actions { display: flex; flex-direction: column; gap: 10px; }
+    .va-actions {
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      width: 100%; max-width: 300px; margin-top: 4px;
+    }
     .va-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px;
-      padding: 12px 20px; border-radius: 999px; font: 700 13px var(--sans);
+      padding: 14px 28px; border-radius: 999px; font: 700 14px var(--sans);
       cursor: pointer; border: none; transition: background .18s, transform .12s;
+      width: 100%;
     }
     .va-btn:hover { transform: translateY(-1px); }
     .va-btn-primary { background: #c8f536; color: #020c06; }
     .va-btn-primary:hover { background: #d9f84d; }
-    .va-btn-danger { background: rgba(255,80,80,.12); color: #ff7070; border: 1px solid rgba(255,80,80,.25); }
-    .va-btn-danger:hover { background: rgba(255,80,80,.2); }
-    .va-btn-ghost { background: rgba(255,255,255,.06); color: rgba(255,255,255,.65); border: 1px solid rgba(255,255,255,.1); }
+    .va-btn-danger { background: rgba(255,80,80,.1); color: #ff7070; border: 1px solid rgba(255,80,80,.22); }
+    .va-btn-danger:hover { background: rgba(255,80,80,.18); }
+    .va-btn-ghost { background: rgba(255,255,255,.05); color: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.1); }
     .va-btn-ghost:hover { background: rgba(255,255,255,.1); color: #fff; }
     .va-btn:disabled { opacity: .4; cursor: default; transform: none; }
 
-    /* ── Right panel: results ── */
-    .va-right { padding: 32px 32px; display: flex; flex-direction: column; gap: 20px; }
-
-    .va-results-hd {
-      font: 800 13px var(--barlow); letter-spacing: 3px; text-transform: uppercase;
-      color: rgba(255,255,255,.35);
+    /* ── Results (below, only shown when announced) ── */
+    .va-results-wrap {
+      width: 100%; max-width: 680px;
+      border-top: 1px solid rgba(255,255,255,.07);
+      padding-top: 28px; margin-top: 10px;
+      display: flex; flex-direction: column; gap: 14px;
     }
-
+    .va-results-hd {
+      font: 800 11px var(--barlow); letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,.28); text-align: center;
+    }
     .va-results { display: flex; flex-direction: column; gap: 8px; }
-
-    .va-no-votes { color: rgba(255,255,255,.25); font: 400 14px var(--sans); }
+    .va-no-votes { color: rgba(255,255,255,.25); font: 400 14px var(--sans); text-align: center; }
 
     .va-row {
-      display: grid; grid-template-columns: 32px 1fr auto 160px 48px;
-      align-items: center; gap: 10px; padding: 12px 16px;
+      display: grid; grid-template-columns: 36px 1fr auto 180px 52px;
+      align-items: center; gap: 12px; padding: 13px 18px;
       background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
-      border-radius: 10px; transition: background .15s;
+      border-radius: 12px;
     }
-    .va-row.va-row-top {
-      background: rgba(200,245,54,.06); border-color: rgba(200,245,54,.2);
-    }
-    .va-row:hover { background: rgba(255,255,255,.05); }
-    .va-pos { font: 800 14px var(--barlow); color: rgba(255,255,255,.25); text-align: center; }
+    .va-row.va-row-top { background: rgba(200,245,54,.06); border-color: rgba(200,245,54,.18); }
+    .va-pos { font: 800 15px var(--barlow); color: rgba(255,255,255,.22); text-align: center; }
     .va-row.va-row-top .va-pos { color: #c8f536; }
-    .va-pname { font: 500 15px var(--sans); color: rgba(255,255,255,.85); white-space: nowrap; }
+    .va-pname { font: 500 15px var(--sans); color: rgba(255,255,255,.85); }
     .va-prank { flex-shrink: 0; }
     .va-bar-w { height: 6px; background: rgba(255,255,255,.08); border-radius: 3px; overflow: hidden; }
-    .va-bar { height: 100%; background: rgba(200,245,54,.5); border-radius: 3px; transition: width .4s; }
+    .va-bar { height: 100%; background: rgba(200,245,54,.45); border-radius: 3px; transition: width .4s; }
     .va-row.va-row-top .va-bar { background: #c8f536; }
-    .va-pcount { font: 700 15px var(--barlow); color: rgba(255,255,255,.6); text-align: right; }
+    .va-pcount { font: 700 16px var(--barlow); color: rgba(255,255,255,.5); text-align: right; }
     .va-row.va-row-top .va-pcount { color: #c8f536; }
 
-    @media (max-width: 768px) {
-      .va-active { grid-template-columns: 1fr; }
-      .va-left { border-right: none; border-bottom: 1px solid rgba(255,255,255,.07); }
-      .va-row { grid-template-columns: 28px 1fr auto 80px 36px; }
+    /* ── Password modal ── */
+    .pw-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.78); z-index: 500;
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+    .pw-overlay[hidden] { display: none; }
+    .pw-modal {
+      background: #0d1f14; border: 1px solid rgba(200,245,54,.2);
+      border-radius: 18px; width: 100%; max-width: 360px;
+      padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 18px;
+    }
+    .pw-title { font: 800 14px var(--barlow); letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,.85); margin: 0; }
+    .pw-input {
+      width: 100%; padding: 12px 16px; border-radius: 10px;
+      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12);
+      color: #fff; font: 500 15px var(--sans); outline: none; box-sizing: border-box;
+    }
+    .pw-input:focus { border-color: rgba(200,245,54,.5); }
+    .pw-error { font: 500 13px var(--sans); color: #ff7070; min-height: 18px; margin: -8px 0; }
+    .pw-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .pw-cancel {
+      background: none; border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.5); font: 600 13px var(--sans);
+      padding: 9px 20px; border-radius: 999px; cursor: pointer;
+    }
+    .pw-cancel:hover { border-color: rgba(255,255,255,.25); color: #fff; }
+    .pw-ok {
+      background: #c8f536; border: none; color: #020c06;
+      font: 700 13px var(--sans); padding: 9px 24px; border-radius: 999px; cursor: pointer;
+    }
+    .pw-ok:hover { background: #d9f84d; }
+
+    @media (max-width: 540px) {
+      .va-active { padding: 24px 16px 40px; }
+      .va-qr-block { padding: 20px 16px 14px; }
+      .va-row { grid-template-columns: 28px 1fr auto 80px 36px; gap: 8px; padding: 10px 12px; }
     }
   </style>
 </head>
@@ -185,10 +224,23 @@
     </div>
   </main>
 
+  <!-- Password modal -->
+  <div class="pw-overlay" id="pwOverlay" hidden>
+    <div class="pw-modal">
+      <p class="pw-title">🔒 Xác nhận công bố</p>
+      <input class="pw-input" type="password" id="pwInput" placeholder="Nhập mật khẩu admin..." autocomplete="off">
+      <p class="pw-error" id="pwError"></p>
+      <div class="pw-actions">
+        <button class="pw-cancel" id="pwCancel">Hủy</button>
+        <button class="pw-ok" id="pwOk">Công bố ngay</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
   <script src="supabase-config.js"></script>
   <script src="tournament-data.js?v=3"></script>
-  <script src="vote-admin.js?v=1"></script>
+  <script src="vote-admin.js?v=3"></script>
 </body>
 </html>

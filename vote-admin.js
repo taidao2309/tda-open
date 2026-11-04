@@ -1,4 +1,6 @@
 (function () {
+  const ADMIN_PASSWORD = '123456';
+
   if (!window.SUPABASE_URL || !window.supabase) {
     document.getElementById('vaLoading').innerHTML =
       '<p style="color:rgba(255,255,255,.4)">Chưa cấu hình Supabase.</p>';
@@ -10,7 +12,35 @@
   const screen = document.getElementById('vaScreen');
   const voteUrl = window.location.origin + '/vote.html';
 
-  let _session = null;
+  // Trạng thái ẩn/hiện kết quả — chỉ local, không lưu DB
+  let resultsVisible = false;
+
+  // ---- password modal ----
+
+  function askPassword(callback) {
+    const overlay = document.getElementById('pwOverlay');
+    const input = document.getElementById('pwInput');
+    const error = document.getElementById('pwError');
+
+    overlay.hidden = false;
+    input.value = '';
+    error.textContent = '';
+    setTimeout(() => input.focus(), 50);
+
+    function tryConfirm() {
+      if (input.value === ADMIN_PASSWORD) {
+        overlay.hidden = true;
+        callback();
+      } else {
+        error.textContent = 'Mật khẩu không đúng.';
+        input.select();
+      }
+    }
+
+    document.getElementById('pwOk').onclick = tryConfirm;
+    document.getElementById('pwCancel').onclick = () => { overlay.hidden = true; };
+    input.onkeydown = e => { if (e.key === 'Enter') tryConfirm(); };
+  }
 
   // ---- data ----
 
@@ -26,7 +56,7 @@
     return data || [];
   }
 
-  // ---- render empty state ----
+  // ---- render empty ----
 
   function renderEmpty(prevEnded) {
     screen.innerHTML = `
@@ -45,12 +75,12 @@
     document.getElementById('btnCreate').addEventListener('click', async () => {
       document.getElementById('btnCreate').disabled = true;
       const { data } = await sb.from('voting_sessions')
-        .insert({ status: 'open', result_announced: false }).select().single();
+        .insert({ status: 'open' }).select().single();
       if (data) render();
     });
   }
 
-  // ---- render active session ----
+  // ---- render active ----
 
   function renderActive(session, votes) {
     const counts = {};
@@ -74,38 +104,38 @@
           </div>`).join('');
 
     const isOpen = session.status === 'open';
+    const btnAnnounceLabel = resultsVisible ? '🙈 Ẩn kết quả' : '📢 Xem kết quả';
 
     screen.innerHTML = `
       <div class="va-active">
-        <div class="va-left">
-          <div class="va-status-row">
-            <span class="va-badge ${isOpen ? 'va-open' : 'va-ended'}">${isOpen ? 'ĐANG MỞ' : 'ĐÃ ĐÓNG'}</span>
-            ${session.result_announced ? '<span class="va-announced">Đã công bố kết quả</span>' : ''}
-            <span class="va-vote-total">${total} / ${players.length} phiếu</span>
-          </div>
-
-          <div class="va-qr-block">
-            <div id="vaQR"></div>
-            <p class="va-url">${voteUrl}</p>
-          </div>
-
-          <div class="va-actions">
-            ${!session.result_announced && isOpen
-              ? '<button class="va-btn va-btn-primary" id="btnAnnounce">📢 Công bố kết quả</button>'
-              : ''}
-            ${isOpen
-              ? '<button class="va-btn va-btn-danger" id="btnEnd">Kết thúc phiên</button>'
-              : '<button class="va-btn va-btn-ghost" id="btnNew">+ Tạo phiên mới</button>'}
-          </div>
+        <p class="va-eyebrow">TDA Open 2026 · Bình chọn</p>
+        <div class="va-status-row">
+          <span class="va-badge ${isOpen ? 'va-open' : 'va-ended'}">${isOpen ? 'ĐANG MỞ' : 'ĐÃ ĐÓNG'}</span>
+          <span class="va-vote-total">${total} / ${players.length} phiếu</span>
         </div>
-
-        <div class="va-right">
+        <div class="va-qr-block">
+          <span class="va-qr-label">QUÉT ĐỂ BÌNH CHỌN</span>
+          <div id="vaQR"></div>
+          <p class="va-url">${voteUrl}</p>
+        </div>
+        <div class="va-actions">
+          ${isOpen ? `<button class="va-btn va-btn-primary" id="btnAnnounce">${btnAnnounceLabel}</button>` : ''}
+          ${isOpen
+            ? '<button class="va-btn va-btn-danger" id="btnEnd">Kết thúc phiên</button>'
+            : '<button class="va-btn va-btn-ghost" id="btnNew">+ Tạo phiên mới</button>'}
+        </div>
+        <div class="va-results-wrap" id="vaResultsWrap" style="display:none">
           <div class="va-results-hd">KẾT QUẢ BÌNH CHỌN (${total} phiếu)</div>
           <div class="va-results">${resultsHtml}</div>
         </div>
       </div>`;
 
-    // Generate QR using qrcodejs (DOM-based, works in browser)
+    // Khôi phục trạng thái ẩn/hiện sau mỗi lần re-render
+    if (resultsVisible) {
+      document.getElementById('vaResultsWrap').style.display = '';
+    }
+
+    // Generate QR
     if (typeof QRCode !== 'undefined') {
       new QRCode(document.getElementById('vaQR'), {
         text: voteUrl,
@@ -117,21 +147,34 @@
       });
     }
 
-    document.getElementById('btnAnnounce')?.addEventListener('click', async () => {
-      await sb.from('voting_sessions').update({ result_announced: true }).eq('id', session.id);
-      render();
+    // Toggle ẩn/hiện kết quả — lần đầu hỏi mật khẩu, sau đó toggle tự do
+    document.getElementById('btnAnnounce')?.addEventListener('click', () => {
+      if (resultsVisible) {
+        // Đang hiện → ẩn đi (không cần password)
+        resultsVisible = false;
+        document.getElementById('vaResultsWrap').style.display = 'none';
+        document.getElementById('btnAnnounce').innerHTML = '📢 Xem kết quả';
+      } else {
+        // Đang ẩn → hỏi password rồi hiện
+        askPassword(() => {
+          resultsVisible = true;
+          document.getElementById('vaResultsWrap').style.display = '';
+          document.getElementById('btnAnnounce').innerHTML = '🙈 Ẩn kết quả';
+        });
+      }
     });
 
     document.getElementById('btnEnd')?.addEventListener('click', async () => {
       if (!confirm('Kết thúc phiên bình chọn? Hành động không thể hoàn tác.')) return;
       await sb.from('voting_sessions').update({ status: 'ended' }).eq('id', session.id);
+      resultsVisible = false;
       render();
     });
 
     document.getElementById('btnNew')?.addEventListener('click', async () => {
       const { data } = await sb.from('voting_sessions')
-        .insert({ status: 'open', result_announced: false }).select().single();
-      if (data) render();
+        .insert({ status: 'open' }).select().single();
+      if (data) { resultsVisible = false; render(); }
     });
   }
 
@@ -139,7 +182,6 @@
 
   async function render() {
     const session = await getSession();
-    _session = session;
 
     if (!session || session.status === 'ended') {
       renderEmpty(!!session);
@@ -157,7 +199,6 @@
     .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'voting_sessions' }, render)
     .subscribe();
 
-  // Initial render
   render();
   setInterval(render, 15000);
 })();
