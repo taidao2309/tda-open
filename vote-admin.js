@@ -12,8 +12,9 @@
   const screen = document.getElementById('vaScreen');
   const voteUrl = window.location.origin + '/vote.html';
 
-  // Trạng thái ẩn/hiện kết quả — chỉ local, không lưu DB
   let resultsVisible = false;
+  let currentSession = null;
+  let votesCache = [];
 
   // ---- password modal ----
 
@@ -56,9 +57,52 @@
     return data || [];
   }
 
+  // ---- build results HTML ----
+
+  function buildResultsHtml(votes) {
+    const counts = {};
+    votes.forEach(v => { counts[v.voted_for_id] = (counts[v.voted_for_id] || 0) + 1; });
+    const total = votes.length;
+    const withVotes = players
+      .map(p => ({ ...p, n: counts[p.id] || 0 }))
+      .filter(p => p.n > 0)
+      .sort((a, b) => b.n - a.n);
+
+    return {
+      total,
+      html: withVotes.length === 0
+        ? '<p class="va-no-votes">Chưa có phiếu nào</p>'
+        : withVotes.map((p, i) => `
+            <div class="va-row${i === 0 ? ' va-row-top' : ''}">
+              <span class="va-pos">${i + 1}</span>
+              <span class="va-pname">${p.name}</span>
+              <span class="va-prank rank-pill rank-${p.rank}">${p.rank}</span>
+              <div class="va-bar-w"><div class="va-bar" style="width:${total ? Math.round(p.n / total * 100) : 0}%"></div></div>
+              <span class="va-pcount">${p.n}</span>
+            </div>`).join('')
+    };
+  }
+
+  // ---- fast update: chỉ update count + results, không rebuild QR ----
+
+  function updateCountAndResults(votes) {
+    votesCache = votes;
+    const { total, html } = buildResultsHtml(votes);
+
+    const totalEl = document.getElementById('vaVoteTotal');
+    if (totalEl) totalEl.textContent = `${total} / ${players.length} phiếu`;
+
+    const hdEl = document.getElementById('vaResultsHd');
+    if (hdEl) hdEl.textContent = `KẾT QUẢ BÌNH CHỌN (${total} phiếu)`;
+
+    const listEl = document.getElementById('vaResultsList');
+    if (listEl) listEl.innerHTML = html;
+  }
+
   // ---- render empty ----
 
   function renderEmpty(prevEnded) {
+    currentSession = null;
     screen.innerHTML = `
       <div class="va-state">
         <div class="va-create-box">
@@ -80,38 +124,20 @@
     });
   }
 
-  // ---- render active ----
+  // ---- render active (full rebuild — chỉ gọi khi session thay đổi) ----
 
   function renderActive(session, votes) {
-    const counts = {};
-    votes.forEach(v => { counts[v.voted_for_id] = (counts[v.voted_for_id] || 0) + 1; });
-    const total = votes.length;
-
-    const sorted = players
-      .map(p => ({ ...p, n: counts[p.id] || 0 }))
-      .sort((a, b) => b.n - a.n);
-    const withVotes = sorted.filter(p => p.n > 0);
-
-    const resultsHtml = withVotes.length === 0
-      ? '<p class="va-no-votes">Chưa có phiếu nào</p>'
-      : withVotes.map((p, i) => `
-          <div class="va-row${i === 0 ? ' va-row-top' : ''}">
-            <span class="va-pos">${i + 1}</span>
-            <span class="va-pname">${p.name}</span>
-            <span class="va-prank rank-pill rank-${p.rank}">${p.rank}</span>
-            <div class="va-bar-w"><div class="va-bar" style="width:${total ? Math.round(p.n / total * 100) : 0}%"></div></div>
-            <span class="va-pcount">${p.n}</span>
-          </div>`).join('');
-
+    currentSession = session;
+    votesCache = votes;
+    const { total, html: resultsHtml } = buildResultsHtml(votes);
     const isOpen = session.status === 'open';
-    const btnAnnounceLabel = resultsVisible ? '🙈 Ẩn kết quả' : '📢 Xem kết quả';
 
     screen.innerHTML = `
       <div class="va-active">
         <p class="va-eyebrow">TDA Open 2026 · Bình chọn</p>
         <div class="va-status-row">
           <span class="va-badge ${isOpen ? 'va-open' : 'va-ended'}">${isOpen ? 'ĐANG MỞ' : 'ĐÃ ĐÓNG'}</span>
-          <span class="va-vote-total">${total} / ${players.length} phiếu</span>
+          <span class="va-vote-total" id="vaVoteTotal">${total} / ${players.length} phiếu</span>
         </div>
         <div class="va-qr-block">
           <span class="va-qr-label">QUÉT ĐỂ BÌNH CHỌN</span>
@@ -119,23 +145,21 @@
           <p class="va-url">${voteUrl}</p>
         </div>
         <div class="va-actions">
-          ${isOpen ? `<button class="va-btn va-btn-primary" id="btnAnnounce">${btnAnnounceLabel}</button>` : ''}
+          ${isOpen ? `<button class="va-btn va-btn-primary" id="btnAnnounce">${resultsVisible ? '🙈 Ẩn kết quả' : '📢 Xem kết quả'}</button>` : ''}
           ${isOpen
             ? '<button class="va-btn va-btn-danger" id="btnEnd">Kết thúc phiên</button>'
             : '<button class="va-btn va-btn-ghost" id="btnNew">+ Tạo phiên mới</button>'}
         </div>
         <div class="va-results-wrap" id="vaResultsWrap" style="display:none">
-          <div class="va-results-hd">KẾT QUẢ BÌNH CHỌN (${total} phiếu)</div>
-          <div class="va-results">${resultsHtml}</div>
+          <div class="va-results-hd" id="vaResultsHd">KẾT QUẢ BÌNH CHỌN (${total} phiếu)</div>
+          <div class="va-results" id="vaResultsList">${resultsHtml}</div>
         </div>
       </div>`;
 
-    // Khôi phục trạng thái ẩn/hiện sau mỗi lần re-render
     if (resultsVisible) {
       document.getElementById('vaResultsWrap').style.display = '';
     }
 
-    // Generate QR
     if (typeof QRCode !== 'undefined') {
       new QRCode(document.getElementById('vaQR'), {
         text: voteUrl,
@@ -147,15 +171,12 @@
       });
     }
 
-    // Toggle ẩn/hiện kết quả — lần đầu hỏi mật khẩu, sau đó toggle tự do
     document.getElementById('btnAnnounce')?.addEventListener('click', () => {
       if (resultsVisible) {
-        // Đang hiện → ẩn đi (không cần password)
         resultsVisible = false;
         document.getElementById('vaResultsWrap').style.display = 'none';
         document.getElementById('btnAnnounce').innerHTML = '📢 Xem kết quả';
       } else {
-        // Đang ẩn → hỏi password rồi hiện
         askPassword(() => {
           resultsVisible = true;
           document.getElementById('vaResultsWrap').style.display = '';
@@ -179,16 +200,14 @@
     });
   }
 
-  // ---- main render ----
+  // ---- main render (full — gọi khi load hoặc session thay đổi) ----
 
   async function render() {
     const session = await getSession();
-
     if (!session || session.status === 'ended') {
       renderEmpty(!!session);
       return;
     }
-
     const votes = await getVotes(session.id);
     renderActive(session, votes);
   }
@@ -196,10 +215,18 @@
   // ---- realtime ----
 
   sb.channel('va_admin_live')
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'votes' }, render)
-    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'voting_sessions' }, render)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'votes' },
+      async payload => {
+        // Có vote mới: chỉ fetch votes rồi update UI tại chỗ, không rebuild trang
+        if (!currentSession) return;
+        const votes = await getVotes(currentSession.id);
+        updateCountAndResults(votes);
+      }
+    )
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'voting_sessions' },
+      () => render()  // Session thay đổi (kết thúc...) → rebuild toàn bộ
+    )
     .subscribe();
 
   render();
-  setInterval(render, 15000);
 })();
