@@ -228,8 +228,8 @@ window.TDA_TOURNAMENT = {
         group: [
             {
                 "group": "A",
-                "home": "T01",
-                "away": "T07",
+                "home": "T03",
+                "away": "T05",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 1,
@@ -238,8 +238,8 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "A",
-                "home": "T03",
-                "away": "T05",
+                "home": "T10",
+                "away": "T01",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 1,
@@ -308,8 +308,8 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "A",
-                "home": "T05",
-                "away": "T01",
+                "home": "T10",
+                "away": "T03",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 3,
@@ -318,7 +318,7 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "A",
-                "home": "T10",
+                "home": "T01",
                 "away": "T07",
                 "scoreHome": null,
                 "scoreAway": null,
@@ -348,8 +348,8 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "A",
-                "home": "T10",
-                "away": "T01",
+                "home": "T07",
+                "away": "T03",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 4,
@@ -358,8 +358,8 @@ window.TDA_TOURNAMENT = {
             },
             {
                 "group": "A",
-                "home": "T07",
-                "away": "T03",
+                "home": "T05",
+                "away": "T01",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 4,
@@ -389,7 +389,7 @@ window.TDA_TOURNAMENT = {
             {
                 "group": "A",
                 "home": "T10",
-                "away": "T03",
+                "away": "T07",
                 "scoreHome": null,
                 "scoreAway": null,
                 "round": 5,
