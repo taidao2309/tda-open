@@ -24,6 +24,22 @@ const teamList=document.querySelector('#teamList'), standingRows=document.queryS
 const playerById=id=>players.find(player=>player.id===id);
 const teamById=id=>teams.find(team=>team.id===id);
 function teamLabel(value){ return teamById(value)?.name || value; }
+function groupStandings(group){
+  const stats=teams.filter(team=>team.group===group).map(team=>({team,played:0,won:0,drawn:0,lost:0,points:0}));
+  matches.group.filter(match=>match.group===group&&Number.isFinite(match.scoreHome)&&Number.isFinite(match.scoreAway)).forEach(match=>{
+    const home=stats.find(row=>row.team.id===match.home),away=stats.find(row=>row.team.id===match.away);
+    if(!home||!away)return;home.played++;away.played++;
+    if(match.scoreHome>match.scoreAway){home.won++;home.points+=3;away.lost++;}
+    else if(match.scoreAway>match.scoreHome){away.won++;away.points+=3;home.lost++;}
+    else{home.drawn++;home.points++;away.drawn++;away.points++;}
+  });
+  const headToHead=(a,b)=>{
+    const match=matches.group.find(item=>item.group===group&&((item.home===a.team.id&&item.away===b.team.id)||(item.home===b.team.id&&item.away===a.team.id))&&Number.isFinite(item.scoreHome)&&Number.isFinite(item.scoreAway));
+    if(!match)return 0;
+    return (match.home===b.team.id?match.scoreHome:match.scoreAway)-(match.home===a.team.id?match.scoreHome:match.scoreAway);
+  };
+  return stats.sort((a,b)=>b.points-a.points||b.won-a.won||b.drawn-a.drawn||headToHead(a,b)||a.team.name.localeCompare(b.team.name,'vi'));
+}
 function renderGroup(group){
   groupSwitch.querySelectorAll('button').forEach(button=>button.classList.toggle('active',button.dataset.group===group));
   standingGroup.textContent=group;
@@ -32,15 +48,7 @@ function renderGroup(group){
     const members=team.playerIds.map(playerById).filter(Boolean);
     const ballNo=parseInt(team.id.slice(1),10);return `<article class="team-card"><div class="team-id"><div class="draw-ball" data-ball="${ballNo}"><span>${ballNo}</span></div><b>${team.name}</b></div><div class="team-members">${members.length?members.map(player=>`<p><span>${player.name}</span><i class="rank-${player.rank}">Rank ${player.rank}</i></p>`).join(''):'<p class="waiting">Chưa chia cơ thủ</p>'}</div></article>`;
   }).join('');
-  const stats=groupTeams.map(team=>({team,played:0,won:0,drawn:0,lost:0,points:0}));
-  matches.group.filter(match=>match.group===group && Number.isFinite(match.scoreHome) && Number.isFinite(match.scoreAway)).forEach(match=>{
-    const home=stats.find(row=>row.team.id===match.home), away=stats.find(row=>row.team.id===match.away);
-    if(!home||!away)return; home.played++;away.played++;
-    if(match.scoreHome>match.scoreAway){home.won++;home.points+=3;away.lost++;}
-    else if(match.scoreAway>match.scoreHome){away.won++;away.points+=3;home.lost++;}
-    else{home.drawn++;home.points+=1;away.drawn++;away.points+=1;}
-  });
-  stats.sort((a,b)=>b.points-a.points||b.won-a.won||b.drawn-a.drawn||a.team.name.localeCompare(b.team.name,'vi'));
+  const stats=groupStandings(group);
   standingRows.innerHTML=stats.map((row,index)=>`<div class="standing-row ${index<2?'qualified':''}"><span><i>${index+1}</i>${row.team.name}</span><span>${row.played}</span><span>${row.won}</span><span>${row.drawn}</span><span>${row.lost}</span><b>${row.points}</b></div>`).join('');
 }
 groupSwitch.addEventListener('click',event=>{if(event.target.matches('button'))renderGroup(event.target.dataset.group)});renderGroup('A');
@@ -65,12 +73,17 @@ const bracketBoard=document.querySelector('#bracketBoard');
 const bracketName=value=>teamLabel(value)||'?';
 const bracketScore=value=>Number.isFinite(value)?value:'—';
 function renderBracket(){
-  const semifinals=matches.semifinal||[],finalMatch=(matches.final||[])[0];
-  const semifinalHtml=semifinals.length?semifinals.map(match=>`<div class="duel"><p><b>${bracketName(match.home)}</b><span>${bracketScore(match.scoreHome)}</span></p><p><b>${bracketName(match.away)}</b><span>${bracketScore(match.scoreAway)}</span></p></div>`).join(''):'<div class="duel"><p><b>?</b><span>—</span></p></div>';
-  const finalHtml=finalMatch?`<div class="duel featured"><p><b>${bracketName(finalMatch.home)}</b><span>${bracketScore(finalMatch.scoreHome)}</span></p><p><b>${bracketName(finalMatch.away)}</b><span>${bracketScore(finalMatch.scoreAway)}</span></p></div>`:'<div class="duel featured"><p><b>?</b><span>—</span></p></div>';
+  const sourceSemifinals=matches.semifinal||[],storedFinal=(matches.final||[])[0];
+  const standingA=groupStandings('A'),standingB=groupStandings('B');
+  const semifinals=sourceSemifinals.map((match,index)=>({...match,home:index===0?standingA[0]?.team.id:standingB[0]?.team.id,away:index===0?standingB[1]?.team.id:standingA[1]?.team.id}));
+  const winner=match=>match&&Number.isFinite(match.scoreHome)&&Number.isFinite(match.scoreAway)&&match.scoreHome!==match.scoreAway?(match.scoreHome>match.scoreAway?match.home:match.away):null;
+  const finalMatch=storedFinal?{...storedFinal,home:winner(semifinals[0])||'Th\u1eafng b\u00e1n k\u1ebft 1',away:winner(semifinals[1])||'Th\u1eafng b\u00e1n k\u1ebft 2'}:null;
+  const side=(id,score)=>{const team=teamById(id),members=team?.playerIds.map(playerById).filter(Boolean).map(player=>player.name).join(' \u00b7 ');return `<p><b>${bracketName(id)}${members?`<small>${members}</small>`:''}</b><span>${bracketScore(score)}</span></p>`;};
+  const semifinalHtml=semifinals.map(match=>`<div class="duel">${side(match.home,match.scoreHome)}${side(match.away,match.scoreAway)}</div>`).join('');
+  const finalHtml=finalMatch?`<div class="duel featured">${side(finalMatch.home,finalMatch.scoreHome)}${side(finalMatch.away,finalMatch.scoreAway)}</div>`:'<div class="duel featured"><p><b>?</b><span>?</span></p></div>';
   let champion='?';
   if(finalMatch&&Number.isFinite(finalMatch.scoreHome)&&Number.isFinite(finalMatch.scoreAway)&&finalMatch.scoreHome!==finalMatch.scoreAway){champion=bracketName(finalMatch.scoreHome>finalMatch.scoreAway?finalMatch.home:finalMatch.away)}
-  bracketBoard.innerHTML=`<div class="round"><h3>BÁN KẾT <span>01</span></h3>${semifinalHtml}</div><div class="round final-round"><h3>CHUNG KẾT <span>02</span></h3>${finalHtml}</div><div class="champion"><span>NHÀ VÔ ĐỊCH</span><div class="trophy">♛</div><h3>${champion==='?'?'?':champion}</h3></div>`;
+  bracketBoard.innerHTML=`<div class="round"><h3>B\u00c1N K\u1ebeT <span>01</span></h3>${semifinalHtml}</div><div class="round final-round"><h3>CHUNG K\u1ebeT <span>02</span></h3>${finalHtml}</div><div class="champion"><span>NH\u00c0 V\u00d4 \u0110\u1ecaCH</span><div class="trophy">\u265b</div><h3>${champion==='?'?'?':champion}</h3></div>`;
 }
 renderBracket();
 
@@ -141,39 +154,3 @@ window.addEventListener('scroll',requestMotion,{passive:true});window.addEventLi
 
 const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){entry.target.animate([{opacity:0,transform:'translate3d(0,26px,0)'},{opacity:1,transform:'translate3d(0,0,0)'}],{duration:720,delay:Math.min(+(entry.target.dataset.motionIndex||0)*45,270),easing:'cubic-bezier(.2,.7,.2,1)',fill:'both'});entry.target.classList.add('motion-in');observer.unobserve(entry.target)}}),{threshold:.08,rootMargin:'0px 0px -5%'});
 document.querySelectorAll('section:not(.hero):not(.ticker):not(.format) h2, .intro .section-no, .intro .kicker, .intro .lead, .stats article, .player-card,.team-card,.match,.duel,.bracket-board').forEach((el,index)=>{el.dataset.motionIndex=index%6;observer.observe(el)});
-
-// Supabase — load scores on init, realtime + 10s polling fallback
-(async function initSupabase() {
-  if (!window.supabase || !window.SUPABASE_URL || window.SUPABASE_URL === 'YOUR_SUPABASE_URL') return;
-  window._sb = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
-
-  function applyScore({ phase, match_no, score_home, score_away }) {
-    const match = matches[phase]?.find(m => m.no === match_no);
-    if (!match) return;
-    match.scoreHome = score_home;
-    match.scoreAway = score_away;
-  }
-
-  function reRenderAll() {
-    const g = document.querySelector('#groupSwitch button.active')?.dataset.group || 'A';
-    renderGroup(g);
-    renderMatches(getActivePhase());
-    renderBracket();
-  }
-
-  async function fetchAll() {
-    const { data } = await window._sb.from('match_scores').select('*');
-    if (data?.length) { data.forEach(applyScore); reRenderAll(); }
-  }
-
-  await fetchAll();
-
-  window._sb.channel('live_scores')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'match_scores' }, payload => {
-      if (payload.new) { applyScore(payload.new); reRenderAll(); }
-    })
-    .subscribe();
-
-  setInterval(fetchAll, 10000);
-
-})();

@@ -642,3 +642,7 @@ footer>p{position:absolute;left:50%;top:50%;margin:0;transform:translate(-50%,-5
 .score-clickable{cursor:pointer;transition:border-color .15s}
 .score-clickable:hover{border-color:rgba(168,255,62,.5);color:var(--acid)}
 .score-clickable.editing{border-color:var(--acid);padding:0 6px;display:inline-flex;align-items:center;gap:4px}
+
+#bracketBoard .duel b{display:flex;flex-direction:column;gap:4px}
+#bracketBoard .duel small{display:block!important;font:500 9px var(--sans);letter-spacing:0;color:#768078;text-transform:none}
+
