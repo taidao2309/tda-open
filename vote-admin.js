@@ -229,4 +229,11 @@
     .subscribe();
 
   render();
+
+  // Fallback polling mỗi 3s — chỉ update count + results, không rebuild QR
+  setInterval(async () => {
+    if (!currentSession) return;
+    const votes = await getVotes(currentSession.id);
+    updateCountAndResults(votes);
+  }, 3000);
 })();
