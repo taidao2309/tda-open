@@ -24,4 +24,4 @@ Toàn bộ dữ liệu giải đấu được quản lý tại **`tournament-dat
 - `matches`: lịch, bàn thi đấu và tỷ số.
 
 Không đặt dữ liệu giải đấu trong `app.js`; file này chỉ xử lý giao diện. Sau khi sửa
-`tournament-data.js`, commit/push để Vercel tự deploy lại.
+`tournament-data.js`, commit/push để Vercel tự deploy lại
