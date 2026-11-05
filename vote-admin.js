@@ -18,10 +18,11 @@
 
   // ---- password modal ----
 
-  function askPassword(callback) {
+  function askPassword(title, callback) {
     const overlay = document.getElementById('pwOverlay');
     const input = document.getElementById('pwInput');
     const error = document.getElementById('pwError');
+    document.getElementById('pwTitle').textContent = title;
 
     overlay.hidden = false;
     input.value = '';
@@ -184,7 +185,7 @@
         document.getElementById('vaResultsWrap').style.display = 'none';
         document.getElementById('btnAnnounce').innerHTML = '📢 Xem kết quả';
       } else {
-        askPassword(() => {
+        askPassword('📢 Xem kết quả (admin)', () => {
           resultsVisible = true;
           document.getElementById('vaResultsWrap').style.display = '';
           document.getElementById('btnAnnounce').innerHTML = '🙈 Ẩn kết quả';
@@ -193,9 +194,9 @@
     });
 
     document.getElementById('btnClose')?.addEventListener('click', () => {
-      askPassword(async () => {
-        await sb.from('voting_sessions').update({ status: 'closed' }).eq('id', session.id);
-        render();
+      askPassword('🔒 Đóng bình chọn', async () => {
+        const { error } = await sb.from('voting_sessions').update({ status: 'closed' }).eq('id', session.id);
+        if (!error) render();
       });
     });
 
@@ -205,7 +206,7 @@
     });
 
     document.getElementById('btnEnd')?.addEventListener('click', () => {
-      askPassword(async () => {
+      askPassword('⚠️ Kết thúc phiên', async () => {
         await sb.from('voting_sessions').update({ status: 'ended' }).eq('id', session.id);
         resultsVisible = false;
         render();
