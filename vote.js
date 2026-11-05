@@ -47,13 +47,15 @@
 
     const { data, error } = await sb.from('voting_sessions')
       .select('*')
-      .eq('status', 'open')
+      .in('status', ['open', 'closed'])
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle();
 
     if (error || !data) { show('s-no-session'); return; }
     session = data;
+
+    if (data.status === 'closed') { show('s-closed'); return; }
 
     // Check if this device already voted
     const { data: existing } = await sb.from('votes')
@@ -84,7 +86,8 @@
         filter: `id=eq.${data.id}`
       }, payload => {
         session = { ...session, ...payload.new };
-        if (payload.new.status === 'ended') show('s-ended');
+        if (payload.new.status === 'closed') show('s-closed');
+        else if (payload.new.status === 'ended') show('s-ended');
       })
       .subscribe();
   }

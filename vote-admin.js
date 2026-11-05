@@ -130,25 +130,32 @@
     currentSession = session;
     votesCache = votes;
     const { total, html: resultsHtml } = buildResultsHtml(votes);
-    const isOpen = session.status === 'open';
+    const isOpen   = session.status === 'open';
+    const isClosed = session.status === 'closed';
+    const isActive = isOpen || isClosed;
+
+    const badgeClass = isOpen ? 'va-open' : isClosed ? 'va-closed' : 'va-ended';
+    const badgeLabel = isOpen ? 'ĐANG MỞ'  : isClosed ? 'ĐÃ ĐÓNG VOTE' : 'ĐÃ KẾT THÚC';
 
     screen.innerHTML = `
       <div class="va-active">
         <p class="va-eyebrow">TDA Open 2026 · Bình chọn</p>
         <div class="va-status-row">
-          <span class="va-badge ${isOpen ? 'va-open' : 'va-ended'}">${isOpen ? 'ĐANG MỞ' : 'ĐÃ ĐÓNG'}</span>
+          <span class="va-badge ${badgeClass}">${badgeLabel}</span>
           <span class="va-vote-total" id="vaVoteTotal">${total} phiếu</span>
         </div>
         <div class="va-qr-block">
-          <span class="va-qr-label">QUÉT ĐỂ BÌNH CHỌN</span>
+          <span class="va-qr-label">${isOpen ? 'QUÉT ĐỂ BÌNH CHỌN' : 'ĐÃ ĐÓNG NHẬN PHIẾU'}</span>
           <div id="vaQR"></div>
           <p class="va-url">${voteUrl}</p>
         </div>
         <div class="va-actions">
-          ${isOpen ? `<button class="va-btn va-btn-primary" id="btnAnnounce">${resultsVisible ? '🙈 Ẩn kết quả' : '📢 Xem kết quả'}</button>` : ''}
-          ${isOpen
+          ${isActive ? `<button class="va-btn va-btn-primary" id="btnAnnounce">${resultsVisible ? '🙈 Ẩn kết quả' : '📢 Xem kết quả'}</button>` : ''}
+          ${isOpen   ? '<button class="va-btn va-btn-warning" id="btnClose">🔒 Đóng bình chọn</button>' : ''}
+          ${isClosed ? '<button class="va-btn va-btn-ghost"   id="btnReopen">🔓 Mở lại</button>'       : ''}
+          ${isActive
             ? '<button class="va-btn va-btn-danger" id="btnEnd">Kết thúc phiên</button>'
-            : '<button class="va-btn va-btn-ghost" id="btnNew">+ Tạo phiên mới</button>'}
+            : '<button class="va-btn va-btn-ghost"  id="btnNew">+ Tạo phiên mới</button>'}
         </div>
         <div class="va-results-wrap" id="vaResultsWrap" style="display:none">
           <div class="va-results-hd" id="vaResultsHd">KẾT QUẢ BÌNH CHỌN (${total} phiếu)</div>
@@ -185,6 +192,18 @@
       }
     });
 
+    document.getElementById('btnClose')?.addEventListener('click', () => {
+      askPassword(async () => {
+        await sb.from('voting_sessions').update({ status: 'closed' }).eq('id', session.id);
+        render();
+      });
+    });
+
+    document.getElementById('btnReopen')?.addEventListener('click', async () => {
+      await sb.from('voting_sessions').update({ status: 'open' }).eq('id', session.id);
+      render();
+    });
+
     document.getElementById('btnEnd')?.addEventListener('click', () => {
       askPassword(async () => {
         await sb.from('voting_sessions').update({ status: 'ended' }).eq('id', session.id);
@@ -205,7 +224,7 @@
   async function render() {
     const session = await getSession();
     if (!session || session.status === 'ended') {
-      renderEmpty(!!session);
+      renderEmpty(!!session && session.status === 'ended');
       return;
     }
     const votes = await getVotes(session.id);
