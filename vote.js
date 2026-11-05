@@ -55,9 +55,7 @@
     if (error || !data) { show('s-no-session'); return; }
     session = data;
 
-    if (data.status === 'closed') { show('s-closed'); return; }
-
-    // Check if this device already voted
+    // Check if this device already voted (ưu tiên trước khi check closed)
     const { data: existing } = await sb.from('votes')
       .select('voted_for_id')
       .eq('session_id', session.id)
@@ -72,6 +70,9 @@
       show('s-already');
       return;
     }
+
+    // Chưa vote mà phiên đã đóng → không cho vote nữa
+    if (data.status === 'closed') { show('s-closed'); return; }
 
     // Render vote list (all players)
     const list = document.getElementById('voteList');
