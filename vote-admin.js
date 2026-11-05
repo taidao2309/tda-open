@@ -1,5 +1,5 @@
 (function () {
-  const ADMIN_PASSWORD = '123456';
+  const ADMIN_PASSWORD = '1';
 
   if (!window.SUPABASE_URL || !window.supabase) {
     document.getElementById('vaLoading').innerHTML =
