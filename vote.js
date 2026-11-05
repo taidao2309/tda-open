@@ -62,6 +62,31 @@
       .eq('voter_id', deviceId)
       .maybeSingle();
 
+    // Render vote list helper
+    function showVoteList() {
+      const list = document.getElementById('voteList');
+      list.innerHTML = '';
+      players.forEach(p => list.appendChild(playerBtn(p, () => confirmStep(p.id))));
+      show('s-vote');
+    }
+
+    // Setup realtime TRƯỚC mọi early return — để bắt cả open lại
+    sb.channel('vp_session_' + data.id)
+      .on('postgres_changes', {
+        event: 'UPDATE', schema: 'public', table: 'voting_sessions',
+        filter: `id=eq.${data.id}`
+      }, payload => {
+        session = { ...session, ...payload.new };
+        const st = payload.new.status;
+        if (st === 'ended') { show('s-ended'); return; }
+        if (st === 'closed') { show('s-closed'); return; }
+        if (st === 'open') {
+          // Mở lại: nếu chưa vote thì hiện list, đã vote thì giữ nguyên
+          if (!existing) showVoteList();
+        }
+      })
+      .subscribe();
+
     if (existing) {
       const vf = byId(existing.voted_for_id);
       document.getElementById('alreadyMsg').textContent = vf
@@ -74,23 +99,7 @@
     // Chưa vote mà phiên đã đóng → không cho vote nữa
     if (data.status === 'closed') { show('s-closed'); return; }
 
-    // Render vote list (all players)
-    const list = document.getElementById('voteList');
-    list.innerHTML = '';
-    players.forEach(p => list.appendChild(playerBtn(p, () => confirmStep(p.id))));
-    show('s-vote');
-
-    // Listen for session end
-    sb.channel('vp_session_' + data.id)
-      .on('postgres_changes', {
-        event: 'UPDATE', schema: 'public', table: 'voting_sessions',
-        filter: `id=eq.${data.id}`
-      }, payload => {
-        session = { ...session, ...payload.new };
-        if (payload.new.status === 'closed') show('s-closed');
-        else if (payload.new.status === 'ended') show('s-ended');
-      })
-      .subscribe();
+    showVoteList();
   }
 
   // ---- confirm step ----
