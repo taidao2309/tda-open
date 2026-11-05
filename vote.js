@@ -65,8 +65,8 @@
     if (existing) {
       const vf = byId(existing.voted_for_id);
       document.getElementById('alreadyMsg').textContent = vf
-        ? `Thiết bị này đã bình chọn cho ${vf.name}.`
-        : 'Thiết bị này đã ghi nhận phiếu bình chọn.';
+        ? `Bạn đã bình chọn cho ${vf.name}.`
+        : 'Bạn đã ghi nhận phiếu bình chọn.';
       show('s-already');
       return;
     }
