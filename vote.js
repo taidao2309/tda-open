@@ -79,10 +79,10 @@
         session = { ...session, ...payload.new };
         const st = payload.new.status;
         if (st === 'ended') { show('s-ended'); return; }
-        if (st === 'closed') { show('s-closed'); return; }
-        if (st === 'open') {
-          // Mở lại: nếu chưa vote thì hiện list, đã vote thì giữ nguyên
-          if (!existing) showVoteList();
+        // Chỉ show closed/open nếu người này chưa vote
+        if (!existing) {
+          if (st === 'closed') { show('s-closed'); return; }
+          if (st === 'open') showVoteList();
         }
       })
       .subscribe();
