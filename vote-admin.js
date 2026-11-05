@@ -196,7 +196,8 @@
     document.getElementById('btnClose')?.addEventListener('click', () => {
       askPassword('🔒 Đóng bình chọn', async () => {
         const { error } = await sb.from('voting_sessions').update({ status: 'closed' }).eq('id', session.id);
-        if (!error) render();
+        if (error) { alert('Lỗi: ' + error.message); return; }
+        render();
       });
     });
 
@@ -207,7 +208,8 @@
 
     document.getElementById('btnEnd')?.addEventListener('click', () => {
       askPassword('⚠️ Kết thúc phiên', async () => {
-        await sb.from('voting_sessions').update({ status: 'ended' }).eq('id', session.id);
+        const { error } = await sb.from('voting_sessions').update({ status: 'ended' }).eq('id', session.id);
+        if (error) { alert('Lỗi: ' + error.message); return; }
         resultsVisible = false;
         render();
       });
