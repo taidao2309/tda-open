@@ -39,21 +39,12 @@
       </div>
     </div>
 
-    <!-- Session ended (no results) -->
+    <!-- Session ended -->
     <div class="vp-step" id="s-ended">
       <div class="vp-card vp-center">
         <div class="vp-icon">🏁</div>
         <h2>Phiên đã kết thúc</h2>
-        <p>Cảm ơn các cơ thủ đã tham gia bình chọn!</p>
-      </div>
-    </div>
-
-    <!-- Step 1: Who are you? -->
-    <div class="vp-step" id="s-identity">
-      <div class="vp-card">
-        <h2>Bạn là ai?</h2>
-        <p class="vp-sub">Chọn tên của bạn để bắt đầu bình chọn</p>
-        <div class="vp-player-list" id="identityList"></div>
+        <p>Cảm ơn bạn đã tham gia bình chọn!</p>
       </div>
     </div>
 
@@ -62,16 +53,15 @@
       <div class="vp-card vp-center">
         <div class="vp-icon">✅</div>
         <h2>Bạn đã bình chọn rồi</h2>
-        <p id="alreadyMsg"></p>
+        <p id="alreadyMsg">Thiết bị này đã ghi nhận phiếu bình chọn.</p>
       </div>
     </div>
 
-    <!-- Step 2: Vote for someone -->
+    <!-- Vote: pick a player -->
     <div class="vp-step" id="s-vote">
       <div class="vp-card">
-        <div class="vp-identity-bar" id="identityBar"></div>
         <h2>Cơ thủ ấn tượng nhất</h2>
-        <p class="vp-sub">Chọn 1 người bạn ấn tượng nhất (trừ bản thân)</p>
+        <p class="vp-sub">Chọn 1 cơ thủ bạn ấn tượng nhất trong giải đấu</p>
         <div class="vp-player-list" id="voteList"></div>
       </div>
     </div>
@@ -104,18 +94,6 @@
         <p>Phiếu bình chọn đã được ghi nhận.</p>
         <div class="vp-success-name" id="successName"></div>
         <p class="vp-sub">Kết quả sẽ được ban tổ chức công bố sau.</p>
-      </div>
-    </div>
-
-    <!-- Results (after announcement) -->
-    <div class="vp-step" id="s-results">
-      <div class="vp-card">
-        <div class="vp-results-header">
-          <span class="vp-icon">🏆</span>
-          <h2>Kết quả bình chọn</h2>
-          <p class="vp-sub">Cơ thủ ấn tượng nhất TDA Open 2026</p>
-        </div>
-        <div id="resultsDisplay"></div>
       </div>
     </div>
 

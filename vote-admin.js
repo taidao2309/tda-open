@@ -90,7 +90,7 @@
     const { total, html } = buildResultsHtml(votes);
 
     const totalEl = document.getElementById('vaVoteTotal');
-    if (totalEl) totalEl.textContent = `${total} / ${players.length} phiếu`;
+    if (totalEl) totalEl.textContent = `${total} phiếu`;
 
     const hdEl = document.getElementById('vaResultsHd');
     if (hdEl) hdEl.textContent = `KẾT QUẢ BÌNH CHỌN (${total} phiếu)`;
@@ -137,7 +137,7 @@
         <p class="va-eyebrow">TDA Open 2026 · Bình chọn</p>
         <div class="va-status-row">
           <span class="va-badge ${isOpen ? 'va-open' : 'va-ended'}">${isOpen ? 'ĐANG MỞ' : 'ĐÃ ĐÓNG'}</span>
-          <span class="va-vote-total" id="vaVoteTotal">${total} / ${players.length} phiếu</span>
+          <span class="va-vote-total" id="vaVoteTotal">${total} phiếu</span>
         </div>
         <div class="va-qr-block">
           <span class="va-qr-label">QUÉT ĐỂ BÌNH CHỌN</span>
